@@ -1,0 +1,15 @@
+artifact_uri: file:///mlflow_tracking/754383317655925649/8ed29dc410304384a94e90ec4546d78b/artifacts
+end_time: 1717171693463
+entry_point_name: ''
+experiment_id: '754383317655925649'
+lifecycle_stage: active
+run_id: 8ed29dc410304384a94e90ec4546d78b
+run_name: funny-gnu-145
+run_uuid: 8ed29dc410304384a94e90ec4546d78b
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1717171690536
+status: 3
+tags: []
+user_id: Alex
