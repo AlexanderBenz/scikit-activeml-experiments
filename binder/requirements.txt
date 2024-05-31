@@ -1,5 +1,0 @@
-numpy
-mlflow
-pandas
-voila
-matplotlib
