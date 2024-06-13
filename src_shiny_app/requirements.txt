@@ -1,0 +1,6 @@
+shiny
+# mlflow
+numpy
+scipy
+pandas
+matplotlib
