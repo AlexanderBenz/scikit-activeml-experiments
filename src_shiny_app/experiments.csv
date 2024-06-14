@@ -1,0 +1,8 @@
+dataset,model,qs_strategy,batch_size,seed
+cifar10,logistic_regression,random,1,0.csv
+cifar10,parzen_window_classifier,probabilistic_active_learning,1,0.csv
+cifar10,parzen_window_classifier,probabilistic_active_learning,10,0.csv
+cifar10,parzen_window_classifier,random,1,0.csv
+cifar10,parzen_window_classifier,random,10,0.csv
+cifar10,parzen_window_classifier,uncertainty_sampling,1,0.csv
+cifar10,parzen_window_classifier,uncertainty_sampling,1,1.csv
