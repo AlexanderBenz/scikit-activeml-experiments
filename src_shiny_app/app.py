@@ -1,4 +1,6 @@
 from shiny import ui, render, App, reactive
+from shinywidgets import render_plotly, output_widget, render_widget  
+import plotly.graph_objects as go
 import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path
@@ -93,6 +95,8 @@ app_ui = ui.page_fluid(
         ui.output_plot("neg_log_loss"),
         ui.output_plot("average_precision"),
         ui.output_plot("balanced_accuracy"),
+        output_widget("acc_plotly"),
+        ui.download_button("download", "Download results")
     )
 
     
@@ -127,7 +131,6 @@ def server(input, output, session):
             old_path = current_path
             
         selected_df.set(df)
-        
 
     # load selected dataframes
     @reactive.event(input.action_button)
@@ -169,12 +172,18 @@ def server(input, output, session):
         selected_experiments.set(rows)
         return f"Rows selected (select multiple with ctrl): {selected} "
     
-    def create_fig(metric_str, x_label="cycles", y_label="accuracy"):
-        fig, ax = plt.subplots()
+    def create_fig(metric_str, x_label="number of samples", y_label=None, use_pl=False):
         sel_exp = list_expirement_metrics.get()
-        ax.set_title(f"{metric_str} graph")
-        ax.set_xlabel(x_label)
-        ax.set_ylabel(y_label)
+        if y_label is None:
+            y_label = metric_str
+        if use_pl:
+            fig = go.Figure()
+        else:
+            fig, ax = plt.subplots()
+            ax.set_title(f"{metric_str} graph")
+            ax.set_xlabel(x_label)
+            
+            ax.set_ylabel(y_label)
 
         for (df_list, sel) in zip(selected_df.get(),sel_exp):
             metric = []
@@ -183,8 +192,26 @@ def server(input, output, session):
             reshaped_result = np.array(metric).reshape((-1, len(metric[0])))
             errorbar_mean = np.mean(reshaped_result, axis=0)
             errorbar_std = np.std(reshaped_result, axis=0)
-            ax.errorbar(np.arange(1, len(metric[0])+1), errorbar_mean, errorbar_std, label=f"({np.mean(errorbar_mean):.4f}) {'+'.join(sel[:4])}", alpha=0.5)
-        ax.legend()
+            batch_size = int(sel[3])
+            label_name = f"({np.mean(errorbar_mean):.4f}) {'+'.join(sel[:4])}"
+            if use_pl:
+                fig.add_trace(go.Scatter(
+                name=label_name,
+                x=np.arange(0, (len(metric[0]))*batch_size, step=batch_size),
+                y=errorbar_mean,
+                error_y=dict(
+                    type='data', # value of error bar given in data coordinates
+                    array=errorbar_std,
+                    visible=True)
+                    )
+                )
+                
+            else:
+                ax.errorbar(np.arange(0, (len(metric[0]))*batch_size, step=batch_size), errorbar_mean, errorbar_std, label=label_name, alpha=0.5)
+        if use_pl:
+            fig.update_layout(title=dict(text=metric_str), xaxis_title=x_label, yaxis_title=y_label)
+        else:
+            ax.legend()
 
         return fig
 
@@ -229,6 +256,24 @@ def server(input, output, session):
     @reactive.event(input.generate_plots)
     def balanced_accuracy(): 
         return create_fig("balanced_accuracy")  
+    
+    @render_widget
+    @reactive.event(input.generate_plots)
+    def acc_plotly(): 
+        return create_fig("accuracy", use_pl=True)  
+    
+    @render.download(filename="experiemnt_results.csv")
+    @reactive.event(input.generate_plots)
+    #TODO: look at how to zip the files
+    def download():
+        sel_exp = list_expirement_metrics.get()
+        for (df_list, sel) in zip(selected_df.get(),sel_exp):
+            for i, df in enumerate(df_list):
+            # df_list["experiment_path"] = sel
+                csv = df.to_csv(index=False)
+                yield ",".join(sel) + f",{i}\n"
+                yield csv
+
 
 
 app = App(ui=app_ui, server=server)
