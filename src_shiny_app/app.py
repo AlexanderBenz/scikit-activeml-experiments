@@ -29,7 +29,7 @@ selected_experiments = reactive.value([])
 
 # initial params
 
-experiment_path = "."
+experiment_path = "experiments_results\\"
 experiments_df = reactive.value([])
 all_experiments_df = reactive.value()
 selected_df = reactive.value([])
@@ -124,7 +124,8 @@ def server(input, output, session):
             
             filespath = Path(__file__).parent / experiment_path
             current_path = "\\".join(selected_dataframe[:4])
-            filespath = filespath.__str__() + "/" + "\\".join(selected_dataframe)
+            # If you run shiny localy raplace the + with + "/" +
+            filespath = filespath.__str__() + "\\".join(selected_dataframe)
             if old_path != current_path:
                 df.append([])
             df[-1].append(pd.read_csv(filespath))

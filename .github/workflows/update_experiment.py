@@ -11,7 +11,7 @@ files_dict = {
     'seed': [],
 }
 
-experiment_folder = "src_shiny_app/"
+experiment_folder = "src_shiny_app/experiments_results/"
 
 def get_file(files_dict, path="src_shiny_app/"):
     datasets = os.listdir(path)
@@ -33,7 +33,6 @@ def get_file(files_dict, path="src_shiny_app/"):
                         files_dict["qs_strategy"].append(qs_strategy)
                         files_dict["batch_size"].append(batch_size)
                         files_dict["seed"].append(file)
-                        print(f"{dataset},{model},{qs_strategy},{batch_size},{file}")
 
 get_file(files_dict, experiment_folder)
 df = pd.DataFrame.from_dict(data=files_dict)
