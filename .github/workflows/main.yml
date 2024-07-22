@@ -23,6 +23,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements_extra.txt
           pip install pandas
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          token: ${{ secrets.DOCS_PAT }}
       - name: create experiment file
         run: |
           python .github/workflows/update_experiment.py
