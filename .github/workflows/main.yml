@@ -32,12 +32,6 @@ jobs:
           python .github/workflows/update_experiment.py
           shiny static-assets remove
           shinylive export src_shiny_app docs
-          # git config --global user.name AlexanderBenz
-          # git config --global user.email AlexanderBenz@users.noreply.github.com
-
-          # git add -A
-          # git commit -m "create shinylive docs"
-          # git push
         - name: Deploy documentation to Github Pages
         uses: JamesIves/github-pages-deploy-action@4.1.5
         with:
