@@ -1,5 +1,6 @@
 shiny
 shinywidgets
+shinylive
 plotly
 scipy
 matplotlib
