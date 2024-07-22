@@ -87,15 +87,15 @@ app_ui = ui.page_fluid(
         ui.output_text("value"),
     ),
     ui.page_fluid(
-        ui.output_plot("acc_plot"),
-        ui.output_plot("auroc_plot"),
-        ui.output_plot("f1_micro"),
-        ui.output_plot("f1_macro"),
+        output_widget("acc_plot"),
+        output_widget("auroc_plot"),
+        output_widget("f1_micro"),
+        output_widget("f1_macro"),
         # ui.output_plot("neg_brier_score"),
-        ui.output_plot("neg_log_loss"),
-        ui.output_plot("average_precision"),
-        ui.output_plot("balanced_accuracy"),
-        output_widget("acc_plotly"),
+        output_widget("neg_log_loss"),
+        output_widget("average_precision"),
+        output_widget("balanced_accuracy"),
+        # output_widget("acc_plotly"),
         ui.download_button("download", "Download results")
     )
 
@@ -172,7 +172,7 @@ def server(input, output, session):
         selected_experiments.set(rows)
         return f"Rows selected (select multiple with ctrl): {selected} "
     
-    def create_fig(metric_str, x_label="number of samples", y_label=None, use_pl=False):
+    def create_fig(metric_str, x_label="number of samples", y_label=None, use_pl=True):
         sel_exp = list_expirement_metrics.get()
         if y_label is None:
             y_label = metric_str
@@ -215,23 +215,27 @@ def server(input, output, session):
 
         return fig
 
-    @render.plot(alt="Accuracy graph")
+    # @render.plot(alt="Accuracy graph")
+    @render_widget
     @reactive.event(input.generate_plots)
     def acc_plot(): 
         load_selected_df()
         return create_fig("accuracy")
 
-    @render.plot(alt="Auroc graph")
+    # @render.plot(alt="Auroc graph")
+    @render_widget
     @reactive.event(input.generate_plots)
     def auroc_plot():
         return create_fig("auroc")  
     
-    @render.plot(alt="f1_micro graph")
+    # @render.plot(alt="f1_micro graph")
+    @render_widget
     @reactive.event(input.generate_plots)
     def f1_micro(): 
         return create_fig("auroc")  
     
-    @render.plot(alt="f1_macro graph")
+    # @render.plot(alt="f1_macro graph")
+    @render_widget
     @reactive.event(input.generate_plots)
     def f1_macro(): 
         return create_fig("f1_macro")  
@@ -241,26 +245,29 @@ def server(input, output, session):
     # def neg_brier_score(): 
     #     load_selected_df()
     #     return create_fig("neg_brier_score")  
-    
-    @render.plot(alt="neg_log_loss graph")
+
+    # @render.plot(alt="neg_log_loss graph")
+    @render_widget
     @reactive.event(input.generate_plots)
     def neg_log_loss(): 
         return create_fig("neg_log_loss")  
     
-    @render.plot(alt="average_precision graph")
+    # @render.plot(alt="average_precision graph")
+    @render_widget
     @reactive.event(input.generate_plots)
     def average_precision(): 
         return create_fig("average_precision")  
     
-    @render.plot(alt="balanced_accuracy graph")
+    # @render.plot(alt="balanced_accuracy graph")
+    @render_widget
     @reactive.event(input.generate_plots)
     def balanced_accuracy(): 
         return create_fig("balanced_accuracy")  
     
-    @render_widget
-    @reactive.event(input.generate_plots)
-    def acc_plotly(): 
-        return create_fig("accuracy", use_pl=True)  
+    # @render_widget
+    # @reactive.event(input.generate_plots)
+    # def acc_plotly(): 
+    #     return create_fig("accuracy", use_pl=True)  
     
     @render.download(filename="experiemnt_results.csv")
     @reactive.event(input.generate_plots)
