@@ -48,7 +48,7 @@ def to_dict(lst):
 app_ui = ui.page_fluid(
     ui.input_dark_mode(),
     ui.layout_sidebar(
-        ui.panel_sidebar(
+        ui.sidebar(
             ui.h2("Search options"),
             ui.hr(),
             "When selecting None all are selected",
@@ -77,10 +77,8 @@ app_ui = ui.page_fluid(
             ui.input_action_button("action_button", "Search"),  
             
         ),
-        ui.panel_main(
-            ui.output_ui("rows"),
-            ui.output_data_frame("datatable"), 
-        )
+        ui.output_ui("rows"),
+        ui.output_data_frame("datatable"),
     ),
     ui.layout_column_wrap(
         ui.input_action_button("generate_plots", "Generate plots"),
