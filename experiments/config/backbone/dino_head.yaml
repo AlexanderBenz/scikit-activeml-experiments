@@ -1,0 +1,5 @@
+name: "dinov2_vitb14"
+path: "facebookresearch/dinov2"
+class_definition:
+  _target_: torch.hub.load
+  

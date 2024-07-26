@@ -1,0 +1,10 @@
+name: "flowers-102"
+class_definition:
+  _target_: torchvision.datasets.Flowers102
+train_params:
+  split: 'train' 
+eval_params:
+  split: 'val' 
+num_workers: 4
+dataloader_batch_size: 4
+classes: 102

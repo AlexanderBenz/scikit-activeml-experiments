@@ -1,0 +1,12 @@
+name: "letter"
+class_definition:
+  _target_: datasets.load_dataset
+  path: "CogComp/trec"
+  trust_remote_code: True
+params:
+  test_size: 0.3
+classes: 6
+features_name: "text"
+label_name: "coarse_label" 
+dataloader_batch_size: 8
+num_workers: 4

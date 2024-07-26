@@ -1,0 +1,7 @@
+name: "RandomSampling"
+class_definition:
+  _target_: skactiveml.pool.RandomSampling
+params:
+  null
+  # Note to use params update expirement file
+  # missing_label: null

@@ -1,7 +1,7 @@
 numpy
-sklearn
-skactiveml
-hydra
+scikit-learn
+scikit-activeml
+hydra-core
 pandas
-torch
-torchvision
+# torch
+# torchvision

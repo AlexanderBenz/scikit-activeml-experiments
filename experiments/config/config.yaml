@@ -1,0 +1,11 @@
+defaults:
+  - dataset: cifar10
+  - model: logistic_regression
+  - query_strategy: random_sampling
+  - backbone: null
+  - _self_
+batch_size: 1
+n_cycles: 60
+seed: 0
+cache: True
+cache_dir: "./data"

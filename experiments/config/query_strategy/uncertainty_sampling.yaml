@@ -1,0 +1,5 @@
+name: "uncertainty_sampling"
+class_definition:
+  _target_: skactiveml.pool.UncertaintySampling
+params:
+  method: "least_confident"

@@ -1,0 +1,7 @@
+name: "iris"
+class_definition:
+  _target_: openml.datasets.get_dataset
+  dataset_id: 61
+params:
+  test_size: 0.3
+classes: 3
