@@ -1,15 +1,7 @@
-// Shinylive 0.4.1
+// Shinylive 0.5.0
 // Copyright 2024 Posit, PBC
 import {
   Icon,
-  __commonJS,
-  __esm,
-  __export,
-  __privateAdd,
-  __privateMethod,
-  __publicField,
-  __toCommonJS,
-  __toESM,
   appUrlPrefix,
   currentScriptDir,
   editorUrlPrefix,
@@ -21,7 +13,17 @@ import {
   require_jsx_runtime,
   require_react,
   stringToUint8Array
-} from "./chunk-HW2MHHPP.js";
+} from "./chunk-ZBWGEFNY.js";
+import {
+  __commonJS,
+  __esm,
+  __export,
+  __privateAdd,
+  __privateMethod,
+  __publicField,
+  __toCommonJS,
+  __toESM
+} from "./chunk-BQSUMDFT.js";
 
 // node_modules/events/events.js
 var require_events = __commonJS({
@@ -3754,7 +3756,7 @@ var init_main = __esm({
       }
       CodeDescription2.is = is;
     })(CodeDescription || (CodeDescription = {}));
-    (function(Diagnostic4) {
+    (function(Diagnostic2) {
       function create(range, message, severity, code, source, relatedInformation) {
         let result = { range, message };
         if (Is.defined(severity)) {
@@ -3771,15 +3773,15 @@ var init_main = __esm({
         }
         return result;
       }
-      Diagnostic4.create = create;
+      Diagnostic2.create = create;
       function is(value) {
         var _a3;
         let candidate = value;
         return Is.defined(candidate) && Range2.is(candidate.range) && Is.string(candidate.message) && (Is.number(candidate.severity) || Is.undefined(candidate.severity)) && (Is.integer(candidate.code) || Is.string(candidate.code) || Is.undefined(candidate.code)) && (Is.undefined(candidate.codeDescription) || Is.string((_a3 = candidate.codeDescription) === null || _a3 === void 0 ? void 0 : _a3.href)) && (Is.string(candidate.source) || Is.undefined(candidate.source)) && (Is.undefined(candidate.relatedInformation) || Is.typedArray(candidate.relatedInformation, DiagnosticRelatedInformation.is));
       }
-      Diagnostic4.is = is;
+      Diagnostic2.is = is;
     })(Diagnostic || (Diagnostic = {}));
-    (function(Command3) {
+    (function(Command2) {
       function create(title, command2, ...args) {
         let result = { title, command: command2 };
         if (Is.defined(args) && args.length > 0) {
@@ -3787,12 +3789,12 @@ var init_main = __esm({
         }
         return result;
       }
-      Command3.create = create;
+      Command2.create = create;
       function is(value) {
         let candidate = value;
         return Is.defined(candidate) && Is.string(candidate.title) && Is.string(candidate.command);
       }
-      Command3.is = is;
+      Command2.is = is;
     })(Command || (Command = {}));
     (function(TextEdit2) {
       function replace(range, newText) {
@@ -4245,16 +4247,16 @@ var init_main = __esm({
       }
       OptionalVersionedTextDocumentIdentifier2.is = is;
     })(OptionalVersionedTextDocumentIdentifier || (OptionalVersionedTextDocumentIdentifier = {}));
-    (function(TextDocumentItem3) {
+    (function(TextDocumentItem2) {
       function create(uri, languageId, version, text) {
         return { uri, languageId, version, text };
       }
-      TextDocumentItem3.create = create;
+      TextDocumentItem2.create = create;
       function is(value) {
         let candidate = value;
         return Is.defined(candidate) && Is.string(candidate.uri) && Is.string(candidate.languageId) && Is.integer(candidate.version) && Is.string(candidate.text);
       }
-      TextDocumentItem3.is = is;
+      TextDocumentItem2.is = is;
     })(TextDocumentItem || (TextDocumentItem = {}));
     (function(MarkupKind2) {
       MarkupKind2.PlainText = "plaintext";
@@ -4265,12 +4267,12 @@ var init_main = __esm({
       }
       MarkupKind2.is = is;
     })(MarkupKind || (MarkupKind = {}));
-    (function(MarkupContent4) {
+    (function(MarkupContent2) {
       function is(value) {
         const candidate = value;
         return Is.objectLiteral(value) && MarkupKind.is(candidate.kind) && Is.string(candidate.value);
       }
-      MarkupContent4.is = is;
+      MarkupContent2.is = is;
     })(MarkupContent || (MarkupContent = {}));
     (function(CompletionItemKind3) {
       CompletionItemKind3.Text = 1;
@@ -4328,17 +4330,17 @@ var init_main = __esm({
       }
       CompletionItemLabelDetails2.is = is;
     })(CompletionItemLabelDetails || (CompletionItemLabelDetails = {}));
-    (function(CompletionItem3) {
+    (function(CompletionItem2) {
       function create(label) {
         return { label };
       }
-      CompletionItem3.create = create;
+      CompletionItem2.create = create;
     })(CompletionItem || (CompletionItem = {}));
-    (function(CompletionList3) {
+    (function(CompletionList2) {
       function create(items, isIncomplete) {
         return { items: items ? items : [], isIncomplete: !!isIncomplete };
       }
-      CompletionList3.create = create;
+      CompletionList2.create = create;
     })(CompletionList || (CompletionList = {}));
     (function(MarkedString2) {
       function fromPlainText(plainText) {
@@ -6079,12 +6081,12 @@ var require_protocol = __commonJS({
       ShowMessageRequest2.messageDirection = messages_1.MessageDirection.serverToClient;
       ShowMessageRequest2.type = new messages_1.ProtocolRequestType(ShowMessageRequest2.method);
     })(ShowMessageRequest || (exports.ShowMessageRequest = ShowMessageRequest = {}));
-    var LogMessageNotification2;
-    (function(LogMessageNotification3) {
-      LogMessageNotification3.method = "window/logMessage";
-      LogMessageNotification3.messageDirection = messages_1.MessageDirection.serverToClient;
-      LogMessageNotification3.type = new messages_1.ProtocolNotificationType(LogMessageNotification3.method);
-    })(LogMessageNotification2 || (exports.LogMessageNotification = LogMessageNotification2 = {}));
+    var LogMessageNotification;
+    (function(LogMessageNotification2) {
+      LogMessageNotification2.method = "window/logMessage";
+      LogMessageNotification2.messageDirection = messages_1.MessageDirection.serverToClient;
+      LogMessageNotification2.type = new messages_1.ProtocolNotificationType(LogMessageNotification2.method);
+    })(LogMessageNotification || (exports.LogMessageNotification = LogMessageNotification = {}));
     var TelemetryEventNotification;
     (function(TelemetryEventNotification2) {
       TelemetryEventNotification2.method = "telemetry/event";
@@ -6103,19 +6105,19 @@ var require_protocol = __commonJS({
       DidOpenTextDocumentNotification3.messageDirection = messages_1.MessageDirection.clientToServer;
       DidOpenTextDocumentNotification3.type = new messages_1.ProtocolNotificationType(DidOpenTextDocumentNotification3.method);
     })(DidOpenTextDocumentNotification2 || (exports.DidOpenTextDocumentNotification = DidOpenTextDocumentNotification2 = {}));
-    var TextDocumentContentChangeEvent2;
-    (function(TextDocumentContentChangeEvent3) {
+    var TextDocumentContentChangeEvent;
+    (function(TextDocumentContentChangeEvent2) {
       function isIncremental(event) {
         let candidate = event;
         return candidate !== void 0 && candidate !== null && typeof candidate.text === "string" && candidate.range !== void 0 && (candidate.rangeLength === void 0 || typeof candidate.rangeLength === "number");
       }
-      TextDocumentContentChangeEvent3.isIncremental = isIncremental;
+      TextDocumentContentChangeEvent2.isIncremental = isIncremental;
       function isFull(event) {
         let candidate = event;
         return candidate !== void 0 && candidate !== null && typeof candidate.text === "string" && candidate.range === void 0 && candidate.rangeLength === void 0;
       }
-      TextDocumentContentChangeEvent3.isFull = isFull;
-    })(TextDocumentContentChangeEvent2 || (exports.TextDocumentContentChangeEvent = TextDocumentContentChangeEvent2 = {}));
+      TextDocumentContentChangeEvent2.isFull = isFull;
+    })(TextDocumentContentChangeEvent || (exports.TextDocumentContentChangeEvent = TextDocumentContentChangeEvent = {}));
     var DidChangeTextDocumentNotification2;
     (function(DidChangeTextDocumentNotification3) {
       DidChangeTextDocumentNotification3.method = "textDocument/didChange";
@@ -21574,30 +21576,7 @@ var LanguageServerClient = class extends import_events.EventEmitter {
     this.rootUri = rootUri;
     this.versions = /* @__PURE__ */ new Map();
     this.diagnostics = /* @__PURE__ */ new Map();
-  }
-  on(event, listener) {
-    super.on(event, listener);
-    return this;
-  }
-  currentDiagnostics(uri) {
-    return this.diagnostics.get(uri) ?? [];
-  }
-  allDiagnostics() {
-    return Array.from(this.diagnostics.values()).flat();
-  }
-  errorCount() {
-    return this.allDiagnostics().filter(
-      (e2) => e2.severity === import_vscode_languageserver_protocol.DiagnosticSeverity.Error
-    ).length;
-  }
-  /**
-   * Initialize or wait for in-progress initialization.
-   */
-  async initialize() {
-    if (this.initializePromise) {
-      return this.initializePromise;
-    }
-    this.initializePromise = (async () => {
+    this.initPromise = (async () => {
       this.connection.onNotification(
         import_vscode_languageserver_protocol.PublishDiagnosticsNotification.type,
         (params) => {
@@ -21653,8 +21632,7 @@ var LanguageServerClient = class extends import_events.EventEmitter {
         },
         initializationOptions: await this.getInitializationOptions(),
         processId: null,
-        // Do we need both of these?
-        rootUri: this.rootUri,
+        rootUri: null,
         workspaceFolders: [
           {
             name: "src",
@@ -21669,11 +21647,65 @@ var LanguageServerClient = class extends import_events.EventEmitter {
       this.capabilities = capabilities;
       await this.connection.sendNotification(import_vscode_languageserver_protocol.InitializedNotification.type, {});
     })();
-    return this.initializePromise;
   }
+  on(event, listener) {
+    this.initPromise.then(() => {
+      super.on(event, listener);
+    }).catch(() => {
+    });
+    return this;
+  }
+  off(event, listener) {
+    this.initPromise.then(() => {
+      super.off(event, listener);
+    }).catch(() => {
+    });
+    return this;
+  }
+  currentDiagnostics(uri) {
+    return this.diagnostics.get(uri) ?? [];
+  }
+  allDiagnostics() {
+    return Array.from(this.diagnostics.values()).flat();
+  }
+  errorCount() {
+    return this.allDiagnostics().filter(
+      (e2) => e2.severity === import_vscode_languageserver_protocol.DiagnosticSeverity.Error
+    ).length;
+  }
+  // This can be overridden by subclasses. It's used to pass initialization
+  // options to the server.
   async getInitializationOptions() {
+    return null;
+  }
+  async createFile(filename, content2) {
+    const languageId = inferFiletype(filename);
+    if (!languageId) {
+      console.log(
+        `LanguageServerClientExtended: Could not infer language for ${filename}`
+      );
+      return;
+    }
+    await this.didOpenTextDocument({
+      textDocument: {
+        languageId,
+        text: content2,
+        uri: createUri(filename)
+      }
+    });
+  }
+  async deleteFile(filename) {
+    await this.didCloseTextDocument({
+      textDocument: {
+        uri: createUri(filename)
+      }
+    });
+  }
+  async changeFile(filename, changeEvent) {
+    await this.didChangeTextDocument(createUri(filename), [changeEvent]);
   }
   async didOpenTextDocument(params) {
+    await this.initPromise;
     await this.connection.sendNotification(
       import_vscode_languageserver_protocol.DidOpenTextDocumentNotification.type,
       {
@@ -21687,12 +21719,14 @@ var LanguageServerClient = class extends import_events.EventEmitter {
   // We close Python files that are deleted. We never write to the file system,
   // so that way they're effectively deleted.
   async didCloseTextDocument(params) {
+    await this.initPromise;
     await this.connection.sendNotification(
       import_vscode_languageserver_protocol.DidCloseTextDocumentNotification.type,
       params
     );
   }
   async didChangeTextDocument(uri, contentChanges) {
+    await this.initPromise;
     await this.connection.sendNotification(
       import_vscode_languageserver_protocol.DidChangeTextDocumentNotification.type,
       {
@@ -21705,6 +21739,7 @@ var LanguageServerClient = class extends import_events.EventEmitter {
     );
   }
   async completionRequest(params) {
+    await this.initPromise;
     const results = await this.connection.sendRequest(
       import_vscode_languageserver_protocol.CompletionRequest.type,
       params
@@ -21724,60 +21759,12 @@ var LanguageServerClient = class extends import_events.EventEmitter {
   }
 };
 
-// src/language-server/lsp-client.ts
-var LSPClient = class {
-  // The constructor for derive
-  constructor(client) {
-    this.client = client;
-    this.initPromise = this.client.initialize();
-  }
-  on(event, listener) {
-    this.initPromise.then(() => {
-      this.client.on(event, listener);
-    }).catch(() => {
-    });
-  }
-  off(event, listener) {
-    this.initPromise.then(() => {
-      this.client.off(event, listener);
-    }).catch(() => {
-    });
-  }
-  async createFile(filename, content2) {
-    await this.initPromise;
-    const languageId = inferFiletype(filename);
-    if (!languageId) {
-      console.log(`LSPClient: Could not infer language for ${filename}`);
-      return;
-    }
-    this.client.didOpenTextDocument({
-      textDocument: {
-        languageId,
-        text: content2,
-        uri: createUri(filename)
-      }
-    });
-  }
-  async deleteFile(filename) {
-    await this.initPromise;
-    this.client.didCloseTextDocument({
-      textDocument: {
-        uri: createUri(filename)
-      }
-    });
-  }
-  async changeFile(filename, changeEvent) {
-    await this.initPromise;
-    this.client.didChangeTextDocument(createUri(filename), [changeEvent]);
-  }
-};
-
 // src/language-server/null-client.ts
 var import_vscode_jsonrpc = __toESM(require_main());
 var nullClient = null;
 function ensureNullClient() {
   if (!nullClient) {
-    nullClient = new NullClient();
+    nullClient = new NullLspClient();
   }
   return nullClient;
 }
@@ -21793,86 +21780,51 @@ var NullMessageWriter = class extends import_vscode_jsonrpc.AbstractMessageWrite
   end() {
   }
 };
-var NullClient = class extends LSPClient {
+var NullLspClient = class extends LanguageServerClient {
   constructor() {
     const conn = (0, import_vscode_jsonrpc.createMessageConnection)(
       new NullMessageReader(),
       new NullMessageWriter()
     );
     conn.listen();
-    const client = new LanguageServerClient(conn, "en", createUri(""));
-    super(client);
+    super(conn, "en", createUri(""));
   }
-};
-
-// src/language-server/pyright.ts
-var import_vscode_jsonrpc2 = __toESM(require_main());
-var import_browser = __toESM(require_browser());
-var workerScriptName = "pyright-main-9de05813f9fe07eabc93.worker.js";
-var pyright = (language2) => {
-  if (!window.Worker) {
-    return void 0;
-  }
-  const workerScript = currentScriptDir() + `/pyright/${workerScriptName}`;
-  const foreground = new Worker(workerScript, {
-    name: "Pyright-foreground"
-  });
-  foreground.postMessage({
-    type: "browser/boot",
-    mode: "foreground"
-  });
-  const connection = (0, import_vscode_jsonrpc2.createMessageConnection)(
-    new import_browser.BrowserMessageReader(foreground),
-    new import_browser.BrowserMessageWriter(foreground)
-  );
-  const workers = [foreground];
-  connection.onDispose(() => {
-    workers.forEach((w2) => w2.terminate());
-  });
-  let backgroundWorkerCount = 0;
-  foreground.addEventListener("message", (e2) => {
-    if (e2.data && e2.data.type === "browser/newWorker") {
-      const { initialData, port } = e2.data;
-      const background = new Worker(workerScript, {
-        name: `Pyright-background-${++backgroundWorkerCount}`
-      });
-      workers.push(background);
-      background.postMessage(
-        {
-          type: "browser/boot",
-          mode: "background",
-          initialData,
-          port
-        },
-        [port]
-      );
-    }
-  });
-  connection.listen();
-  return new LanguageServerClient(connection, language2, createUri(""));
 };
 
 // src/language-server/pyright-client.ts
+var import_vscode_jsonrpc2 = __toESM(require_main());
+var import_browser = __toESM(require_browser());
+var workerScriptName = "pyright.worker.js";
 var pyrightClient = null;
 function ensurePyrightClient() {
   if (!pyrightClient) {
-    pyrightClient = new PyrightClient();
+    pyrightClient = new PyrightLspClient();
   }
   return pyrightClient;
 }
-var PyrightClient = class extends LSPClient {
+var PyrightLspClient = class extends LanguageServerClient {
   constructor() {
-    const locale = "en";
-    const client = pyright(locale);
-    client.getInitializationOptions = getInitializationOptions;
-    super(client);
+    const workerScript = currentScriptDir() + `/pyright/${workerScriptName}`;
+    const foreground = new Worker(workerScript, {
+      name: "pyright-foreground"
+    });
+    const connection = (0, import_vscode_jsonrpc2.createMessageConnection)(
+      new import_browser.BrowserMessageReader(foreground),
+      new import_browser.BrowserMessageWriter(foreground)
+    );
+    const workers = [foreground];
+    connection.onDispose(() => {
+      workers.forEach((w2) => w2.terminate());
+    });
+    connection.listen();
+    super(connection, "en", createUri(""));
   }
   async createFile(filename, content2) {
     const params = {
       uri: createUri(filename),
       kind: "create"
     };
-    await this.client.connection.sendNotification("pyright/createFile", params);
+    await this.connection.sendNotification("$/createFile", params);
     await super.createFile(filename, content2);
   }
   async deleteFile(filename) {
@@ -21880,19 +21832,23 @@ var PyrightClient = class extends LSPClient {
       uri: createUri(filename),
       kind: "delete"
     };
-    await this.client.connection.sendNotification("pyright/deleteFile", params);
+    await this.connection.sendNotification("$/deleteFile", params);
     await super.deleteFile(filename);
   }
+  /**
+   * This uses fetch() instead of import() so that esbuild will not inline the
+   * entire JSON file into the .js bundle.
+   */
+  async getInitializationOptions() {
+    const response = await fetch(
+      currentScriptDir() + "/pyright/typeshed.en.json"
+    );
+    const typeshed = await response.json();
+    return {
+      files: typeshed
+    };
+  }
 };
-async function getInitializationOptions() {
-  const response = await fetch(
-    currentScriptDir() + "/pyright/typeshed.en.json"
-  );
-  const typeshed = await response.json();
-  return {
-    files: typeshed
-  };
-}
 
 // src/Components/ShareModal.tsx
 var React2 = __toESM(require_react());
@@ -36505,6 +36461,9 @@ var lintGutterCustomTheme = EditorView.baseTheme({
   }
 });
 
+// src/Components/codeMirror/language-server/diagnostics.ts
+var LSP = __toESM(require_main2());
+
 // src/Components/codeMirror/language-server/positions.ts
 var positionToOffset = (document2, position) => {
   if (position.line >= document2.lines) {
@@ -36524,7 +36483,6 @@ var offsetToPosition = (document2, offset) => {
 };
 
 // src/Components/codeMirror/language-server/diagnostics.ts
-var LSP = __toESM(require_main2());
 var severityMapping = {
   [LSP.DiagnosticSeverity.Error]: "error",
   [LSP.DiagnosticSeverity.Warning]: "warning",
@@ -36554,16 +36512,18 @@ function diagnosticToTransaction(editorState, lspDiagnostics) {
   return diagnosticsTransaction;
 }
 
+// src/Components/codeMirror/language-server/autocompletion.ts
+var import_vscode_languageserver_protocol2 = __toESM(require_main2());
+
 // src/Components/codeMirror/language-server/regexp-util.ts
 var escapeRegExp = (unescaped) => {
   return unescaped.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&");
 };
 
 // src/Components/codeMirror/language-server/autocompletion.ts
-var import_vscode_languageserver_protocol2 = __toESM(require_main2());
 var identifierLike = /[a-zA-Z0-9_\u{a1}-\u{10ffff}]+/u;
 function autocompletion2(lspClient, filename) {
-  const client = lspClient.client;
+  const client = lspClient;
   const uri = createUri(filename);
   const findCompletion = async (context) => {
     if (!client || !uri || !client.capabilities?.completionProvider) {
@@ -36666,6 +36626,9 @@ var boost = (item) => {
   }
   return void 0;
 };
+
+// src/Components/codeMirror/language-server/hover.ts
+var import_vscode_languageserver_protocol3 = __toESM(require_main2());
 
 // src/Components/codeMirror/language-server/documentation.ts
 var import_dompurify = __toESM(require_purify());
@@ -38930,9 +38893,8 @@ var renderMarkdown = (markdown) => {
 };
 
 // src/Components/codeMirror/language-server/hover.ts
-var import_vscode_languageserver_protocol3 = __toESM(require_main2());
 function hover(lspClient, filename) {
-  return createHoverTooltip(lspClient.client, filename);
+  return createHoverTooltip(lspClient, filename);
 }
 function createHoverTooltip(client, filename) {
   const uri = createUri(filename);
@@ -38959,6 +38921,9 @@ function createHoverTooltip(client, filename) {
   });
 }
 
+// src/Components/codeMirror/language-server/signatureHelp.ts
+var import_vscode_languageserver_protocol4 = __toESM(require_main2());
+
 // src/Components/codeMirror/language-server/names.ts
 var removeFullyQualifiedName = (fn) => {
   const bracket2 = fn.indexOf("(");
@@ -38975,7 +38940,6 @@ var nameFromSignature = (fn) => {
 };
 
 // src/Components/codeMirror/language-server/signatureHelp.ts
-var import_vscode_languageserver_protocol4 = __toESM(require_main2());
 var setSignatureHelpEffect = StateEffect.define(
   {}
 );
@@ -38999,7 +38963,7 @@ var closeSignatureHelp = (view) => {
   return false;
 };
 var triggerSignatureHelpRequest = async (view, client, uri) => {
-  await client.initialize();
+  await client.initPromise;
   const pos = view.state.selection.main.from;
   const params = {
     textDocument: { uri },
@@ -39120,7 +39084,7 @@ var formatHighlightedParameter = (label, from, to, signatureDoc, activeParameter
   return parent;
 };
 var signatureHelp = (lspClient, filename, automatic) => {
-  const client = lspClient.client;
+  const client = lspClient;
   const uri = createUri(filename);
   class SignatureHelpView {
     constructor(view, automatic2) {
@@ -39210,7 +39174,27 @@ function useTabbedCodeMirror({
     );
     setActiveFileIdx(0);
     setNewFileCounter(1);
-  }, [currentFilesFromApp, inferEditorExtensions]);
+    (async () => {
+      for (const file of files) {
+        if (file.type === "text" && inferFiletype(file.name) === "python") {
+          await lspClient.deleteFile(lspPathPrefix + file.name);
+        }
+      }
+      for (const file of currentFilesFromApp) {
+        if (file.type === "text" && inferFiletype(file.name) === "python") {
+          await lspClient.createFile(lspPathPrefix + file.name, file.content);
+        }
+      }
+    })();
+  }, [
+    // Note that the linter thinks we need to depend on `files`, but we don't --
+    // if we did, this would result in an infinite loop. We only want to remove
+    // `files` if `currentFilesFromApp` changes.
+    lspClient,
+    lspPathPrefix,
+    currentFilesFromApp,
+    inferEditorExtensions
+  ]);
   function closeFile(e2, index) {
     e2.stopPropagation();
     const updatedFiles = [...files];
@@ -39281,15 +39265,17 @@ function useTabbedCodeMirror({
     setFiles(updatedFiles);
     setEditingFilename(null);
     setFilesHaveChanged(true);
-    if (inferFiletype(oldFileName) === "python") {
-      lspClient.deleteFile(lspPathPrefix + oldFileName);
-    }
-    if (inferFiletype(newFileName) === "python") {
-      lspClient.createFile(
-        lspPathPrefix + newFileName,
-        updatedFiles[fileIndex].ref.editorState.doc.toString()
-      );
-    }
+    (async () => {
+      if (inferFiletype(oldFileName) === "python") {
+        await lspClient.deleteFile(lspPathPrefix + oldFileName);
+      }
+      if (inferFiletype(newFileName) === "python") {
+        await lspClient.createFile(
+          lspPathPrefix + newFileName,
+          updatedFiles[fileIndex].ref.editorState.doc.toString()
+        );
+      }
+    })();
   }
   function selectFile(fileName) {
     const fileIndex = files.findIndex((f3) => f3.name === fileName);
@@ -39387,7 +39373,8 @@ function Editor({
   showHeaderBar = true,
   floatingButtons = false,
   updateUrlHashOnRerun = false,
-  appEngine
+  appEngine,
+  style
 }) {
   const lspClient = appEngine === "python" ? ensurePyrightClient() : ensureNullClient();
   const editorInstanceId = useInstanceCounter();
@@ -39418,11 +39405,23 @@ function Editor({
         }),
         languageServerExtensions(lspClient, lspPathPrefix + file.name),
         Prec.high(
-          keymap.of(keyBindings({ runSelectedTextOrCurrentLine, runAllAuto }))
+          keymap.of(
+            keyBindings({
+              runSelectedTextOrCurrentLine,
+              runAllAuto,
+              appEngine
+            })
+          )
         )
       ];
     },
-    [lineNumbers2, setFilesHaveChangedCombined, lspClient, lspPathPrefix]
+    [
+      lineNumbers2,
+      appEngine,
+      setFilesHaveChangedCombined,
+      lspClient,
+      lspPathPrefix
+    ]
   );
   const [cmView, setCmView] = React4.useState();
   const tabbedFiles = useTabbedCodeMirror({
@@ -39737,7 +39736,7 @@ function Editor({
       children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(Icon, { icon: "play" })
     }
   );
-  return /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "shinylive-editor", children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "shinylive-editor", style, children: [
     shareModal,
     showHeaderBar ? /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "editor-header", children: [
       showFileTabs ? /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(FileTabs, { ...tabbedFiles }) : null,
@@ -39831,12 +39830,7 @@ function fileContentsSize(files) {
   return size;
 }
 function diagnosticFilter(diagnostic) {
-  if (diagnostic.severity === 4 && /is unused$/.test(diagnostic.message)) {
-    return false;
-  }
-  if (/Argument does not match parameter type for parameter "value".*Iterable\[SliderValueArg@input_slider\]/s.test(
-    diagnostic.message
-  )) {
+  if (diagnostic.severity === 4 && /is not accessed$/.test(diagnostic.message)) {
     return false;
   }
   return true;
@@ -39854,9 +39848,10 @@ function useInstanceCounter() {
 }
 function keyBindings({
   runSelectedTextOrCurrentLine,
-  runAllAuto
+  runAllAuto,
+  appEngine
 }) {
-  return [
+  const bindings = [
     {
       key: "Mod-Enter",
       run: (view) => {
@@ -39876,6 +39871,41 @@ function keyBindings({
       }
     }
   ];
+  if (appEngine === "r") {
+    const maybeAddWhiteSpace = (view, range, text) => {
+      const line = view.state.doc.lineAt(range.head);
+      const before = view.state.doc.sliceString(line.from, range.from);
+      const after = view.state.doc.sliceString(range.to, line.to);
+      if (!before.endsWith(" ") && !before.endsWith("\n")) {
+        text = " " + text;
+      }
+      if (!after.startsWith(" ") && !after.startsWith("\n")) {
+        text = text + " ";
+      }
+      return text;
+    };
+    const insertText = (view, text) => {
+      const result = view.state.changeByRange((range) => {
+        const adjustedText = maybeAddWhiteSpace(view, range, text);
+        const cursorPosAfter = Math.min(range.from, range.to) + adjustedText.length;
+        return {
+          range: EditorSelection.range(cursorPosAfter, cursorPosAfter),
+          changes: { from: range.from, to: range.to, insert: adjustedText }
+        };
+      });
+      view.dispatch(result);
+      return true;
+    };
+    bindings.push({
+      key: "Alt--",
+      run: (view) => insertText(view, "<-")
+    });
+    bindings.push({
+      key: "Mod-Shift-m",
+      run: (view) => insertText(view, "|>")
+    });
+  }
+  return bindings;
 }
 async function updateBrowserUrlHash(fileContents) {
   const encodedFileContents = await fileContentsToUrlStringInWebWorker(fileContents);
