@@ -1,4 +1,4 @@
-name: "letter"
+name: "trec6"
 class_definition:
   _target_: datasets.load_dataset
   path: "CogComp/trec"

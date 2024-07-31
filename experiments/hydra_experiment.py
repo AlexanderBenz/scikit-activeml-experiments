@@ -254,11 +254,11 @@ def my_app(cfg: DictConfig) -> None:
     # Generate model and query strategy
     model_class_str = str(cfg.model.class_definition._target_).split(".")[0]
     if "skactiveml" != model_class_str:
-        clf = SubSamplingWrapper(SklearnClassifier(instantiate(cfg.model.class_definition, **model_params), random_state=gen_seed(master_random_state), classes=np.arange(classes)), max_candidates=cfg.n_max_candidates, random_state=gen_seed(master_random_state))
+        clf = SklearnClassifier(instantiate(cfg.model.class_definition, **model_params), random_state=gen_seed(master_random_state), classes=np.arange(classes))
     else:
-        clf = SubSamplingWrapper(instantiate(cfg.model.class_definition, random_state=gen_seed(master_random_state), classes=np.arange(classes), **model_params), max_candidates=cfg.n_max_candidates, random_state=gen_seed(master_random_state))
+        clf = instantiate(cfg.model.class_definition, random_state=gen_seed(master_random_state), classes=np.arange(classes), **model_params)
     
-    qs = instantiate(cfg.query_strategy.class_definition, random_state=gen_seed(master_random_state), **qs_params)
+    qs = SubSamplingWrapper(instantiate(cfg.query_strategy.class_definition, random_state=gen_seed(master_random_state), **qs_params), max_candidates=cfg.n_max_candidates, random_state=gen_seed(master_random_state))
     y_train = np.full(shape=y_train_true.shape, fill_value=MISSING_LABEL)
     clf.fit(X_train, y_train)
     processor_name = cpuinfo.get_cpu_info()["brand_raw"]
