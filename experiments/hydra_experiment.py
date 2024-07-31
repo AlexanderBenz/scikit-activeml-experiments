@@ -14,6 +14,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_auc_score, f1_score, log_loss, average_precision_score, balanced_accuracy_score, accuracy_score
 from skactiveml.utils import call_func, MISSING_LABEL
 from skactiveml.classifier import SklearnClassifier
+from skactiveml.pool import SubSamplingWrapper
 from util import get_transformer_by_name
 import cpuinfo
 
@@ -166,7 +167,7 @@ def my_app(cfg: DictConfig) -> None:
         print("No cache found for : " + dataset_name )
         # Load dataset using the method saved in the dataset config
         data_loader_str = str(cfg.dataset.class_definition._target_).split(".")[0]
-        if data_loader_str == "openml":
+        if data_loader_str == "sklearn" or data_loader_str == "openml":
             dataset_tmp = instantiate(cfg.dataset.class_definition, download_data=cache)
             X_df, y, _, _ = dataset_tmp.get_data(target=dataset_tmp.default_target_attribute)
             X = X_df.values
@@ -253,9 +254,9 @@ def my_app(cfg: DictConfig) -> None:
     # Generate model and query strategy
     model_class_str = str(cfg.model.class_definition._target_).split(".")[0]
     if "skactiveml" != model_class_str:
-        clf = SklearnClassifier(instantiate(cfg.model.class_definition, **model_params), random_state=gen_seed(master_random_state), classes=np.arange(classes))
+        clf = SubSamplingWrapper(SklearnClassifier(instantiate(cfg.model.class_definition, **model_params), random_state=gen_seed(master_random_state), classes=np.arange(classes)), max_candidates=cfg.n_max_candidates, random_state=gen_seed(master_random_state))
     else:
-        clf = instantiate(cfg.model.class_definition, random_state=gen_seed(master_random_state), classes=np.arange(classes), **model_params)
+        clf = SubSamplingWrapper(instantiate(cfg.model.class_definition, random_state=gen_seed(master_random_state), classes=np.arange(classes), **model_params), max_candidates=cfg.n_max_candidates, random_state=gen_seed(master_random_state))
     
     qs = instantiate(cfg.query_strategy.class_definition, random_state=gen_seed(master_random_state), **qs_params)
     y_train = np.full(shape=y_train_true.shape, fill_value=MISSING_LABEL)

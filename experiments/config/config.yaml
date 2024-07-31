@@ -9,3 +9,4 @@ n_cycles: 60
 seed: 0
 cache: True
 cache_dir: "./data"
+n_max_candidates: 10000

@@ -231,7 +231,7 @@ def server(input, output, session):
     @render_widget
     @reactive.event(input.generate_plots)
     def f1_micro(): 
-        return create_fig("auroc")  
+        return create_fig("f1_micro")  
     
     # @render.plot(alt="f1_macro graph")
     @render_widget
