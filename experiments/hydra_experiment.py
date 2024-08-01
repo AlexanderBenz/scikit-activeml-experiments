@@ -170,9 +170,10 @@ def my_app(cfg: DictConfig) -> None:
         if data_loader_str == "sklearn" or data_loader_str == "openml":
             if data_loader_str == "openml":
                 dataset_tmp = instantiate(cfg.dataset.class_definition, download_data=cache)
+                X_df, y, _, _ = dataset_tmp.get_data(target=dataset_tmp.default_target_attribute)
             else:
-                dataset_tmp = instantiate(cfg.dataset.class_definition, cache=cache)
-            X_df, y, _, _ = dataset_tmp.get_data(target=dataset_tmp.default_target_attribute)
+                dataset_tmp = instantiate(cfg.dataset.class_definition, cache=cache, return_X_y=True)
+                X_df, y = dataset_tmp
             X = X_df.values
         elif data_loader_str == "datasets":
             dataset = instantiate(cfg.dataset.class_definition, data_dir=data_dir)
