@@ -168,7 +168,10 @@ def my_app(cfg: DictConfig) -> None:
         # Load dataset using the method saved in the dataset config
         data_loader_str = str(cfg.dataset.class_definition._target_).split(".")[0]
         if data_loader_str == "sklearn" or data_loader_str == "openml":
-            dataset_tmp = instantiate(cfg.dataset.class_definition, download_data=cache)
+            if data_loader_str == "openml":
+                dataset_tmp = instantiate(cfg.dataset.class_definition, download_data=cache)
+            else:
+                dataset_tmp = instantiate(cfg.dataset.class_definition, cache=cache)
             X_df, y, _, _ = dataset_tmp.get_data(target=dataset_tmp.default_target_attribute)
             X = X_df.values
         elif data_loader_str == "datasets":
@@ -204,7 +207,7 @@ def my_app(cfg: DictConfig) -> None:
             # Use the embedings model to generate X and y depending on the loading method used
             if dataset is None:
                 X_train, y_train_true = process_dataset(dataset=dataset_train, is_train=True, model_emb=model_emb, batch_size=dataloader_batch_size, num_workers=num_workers, device=device, tokenizer=tokenizer, features_name=features_name, label_name=label_name)
-                X_train, y_train_true = process_dataset(dataset=dataset_eval, is_train=False, model_emb=model_emb, batch_size=dataloader_batch_size, num_workers=num_workers, device=device, tokenizer=tokenizer, features_name=features_name, label_name=label_name)
+                X_test, y_test_true = process_dataset(dataset=dataset_eval, is_train=False, model_emb=model_emb, batch_size=dataloader_batch_size, num_workers=num_workers, device=device, tokenizer=tokenizer, features_name=features_name, label_name=label_name)
                 X = np.append(X_train, X_test, axis=0)
                 y = np.append(y_train_true, y_test_true, axis=0)
             else:

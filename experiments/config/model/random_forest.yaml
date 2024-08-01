@@ -1,6 +1,6 @@
 name: "random_forest"
 class_definition:
-  _target_: sklearn.linear_model.RandomForestClassifier
+  _target_: sklearn.ensemble.RandomForestClassifier
 params:
   n_estimators: 100
   criterion: 'gini'
