@@ -28,11 +28,12 @@ def get_file(files_dict, path="src_shiny_app/"):
                     seed_files = os.path.join(batch_size_folders, batch_size)
                     files = os.listdir(seed_files)
                     for file in files:
-                        files_dict["dataset"].append(dataset)
-                        files_dict["model"].append(model)
-                        files_dict["qs_strategy"].append(qs_strategy)
-                        files_dict["batch_size"].append(batch_size)
-                        files_dict["seed"].append(file)
+                        if ".csv" in file:
+                            files_dict["dataset"].append(dataset)
+                            files_dict["model"].append(model)
+                            files_dict["qs_strategy"].append(qs_strategy)
+                            files_dict["batch_size"].append(batch_size)
+                            files_dict["seed"].append(file)
 
 get_file(files_dict, experiment_folder)
 df = pd.DataFrame.from_dict(data=files_dict)
