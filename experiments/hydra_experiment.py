@@ -269,7 +269,7 @@ def my_app(cfg: DictConfig) -> None:
     y_train = np.full(shape=y_train_true.shape, fill_value=MISSING_LABEL)
     clf.fit(X_train, y_train)
     processor_name = cpuinfo.get_cpu_info()["brand_raw"]
-    dataset_params_name = "dataset_name"
+    dataset_params_name = dataset_name
     if hasattr(cfg, "backbone"):
         dataset_params_name += "_" + embeddings_model
     params = {
