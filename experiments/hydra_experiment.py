@@ -70,12 +70,15 @@ def process_dataset(dataset, is_train, model_emb, batch_size=4, num_workers=4, d
     label_list = []
     
     # Iterate through the DataLoader and extract embeddings
+    model_emb.eval()
     with torch.no_grad():
         for dataloader in dataloaders:
             single_embedding_list = []
             single_label_list = []
             if tokenizer is None:
-                for _, data in enumerate(dataloader):
+                for i, data in enumerate(dataloader):
+                    if i % 10==0:
+                        print(len(dataloader), i)
                     image, label = data
                     embeddings = model_emb(image.to(device)).cpu()
                     single_embedding_list.append(embeddings)
@@ -266,8 +269,11 @@ def my_app(cfg: DictConfig) -> None:
     y_train = np.full(shape=y_train_true.shape, fill_value=MISSING_LABEL)
     clf.fit(X_train, y_train)
     processor_name = cpuinfo.get_cpu_info()["brand_raw"]
+    dataset_params_name = "dataset_name"
+    if hasattr(cfg, "backbone"):
+        dataset_params_name += "_" + embeddings_model
     params = {
-        'dataset': dataset_name + "_" + embeddings_model,
+        'dataset': dataset_params_name,
         'model': model_name,
         'qs': qs_name,
         'batch_size': batch_size,

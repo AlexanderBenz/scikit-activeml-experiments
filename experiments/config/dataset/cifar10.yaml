@@ -8,5 +8,5 @@ train_params:
 eval_params:
   train: False 
 num_workers: 4
-dataloader_batch_size: 4
+dataloader_batch_size: 32
 classes: 10

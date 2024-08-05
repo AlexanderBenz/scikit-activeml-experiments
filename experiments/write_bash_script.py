@@ -85,9 +85,18 @@ def write_commands(
         f"#SBATCH --cpus-per-task={cpus_per_task}",
         f"#SBATCH --partition=main",
         f"#SBATCH --output={slurm_logs_path}/{job_name}_%A_%a.log",
-        f'eval "$(sed -n "$(($SLURM_ARRAY_TASK_ID+{12})) p" {filename})"',
-        f"exit 0",
     ]
+    if cfg_dict["accelerator"] == "gpu":
+            commands += [
+                f"#SBATCH --gres=gpu:1",
+                f'eval "$(sed -n "$(($SLURM_ARRAY_TASK_ID+{13})) p" {filename})"',
+                f"exit 0",
+            ]
+    else:
+        commands += [
+            f'eval "$(sed -n "$(($SLURM_ARRAY_TASK_ID+{12})) p" {filename})"',
+            f"exit 0",
+        ]
     commands_to_save.extend(commands)
     print(filename)
     with open(filename, "w") as f:
@@ -103,7 +112,7 @@ if __name__ == "__main__":
     mem = "10gb"
     max_n_parallel_jobs = 110
     cpus_per_task = 4
-    accelerator = "cpu"
+    accelerator = "gpu"
     slurm_logs_path = ""
 
     # List of seeds to ensure reproducibility.
@@ -116,11 +125,12 @@ if __name__ == "__main__":
     # Note: The experiment will throw an error after downloading the dataset and caching it.
     config_combs = []
     job_name = "download"
-    for dataset, backbone in dataset_with_backbone:
+    for dataset, backbone,  in dataset_with_backbone:
         config_combs.append(
             {
                 "dataset": dataset,
                 "backbone": backbone,
+                "accelerator": accelerator,
                 "cache": True,
                 "params": {
                     "seed": [0],
@@ -155,6 +165,7 @@ if __name__ == "__main__":
         "random_sampling", "uncertainty_sampling"
     ]
     batch_sizes = [1]
+    accelerator = "cpu"
     
     config_combs = []
     job_name = "experiments"
@@ -163,6 +174,7 @@ if __name__ == "__main__":
             {
                 "dataset": dataset,
                 "backbone": backbone,
+                "accelerator": accelerator,
                 "params": {
                     "model": models,
                     "query_strategy": query_strategies,
