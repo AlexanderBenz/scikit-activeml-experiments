@@ -119,7 +119,7 @@ if __name__ == "__main__":
 
     dataset_with_backbone = [
         ("cifar10", "dino_head"), ("cat_and_dog", "dino_head"), ("cifar100", "dino_head"), ("dtd", "dino_head"),
-        ("ag_news", "bert_base"), ("bank77", "bert_base"), ("DBpendia", "bert_base"), ("trec6", "bert_base"),
+        ("ag_news", "bert_base"), ("bank77", "bert_base"), ("DBpedia", "bert_base"), ("trec6", "bert_base"),
         ("letter", None), ("iris", None), ("pendigits", None), ("aloi", None),
     ]
     # ================================= Create bash scripts for downloading datasets. ================================

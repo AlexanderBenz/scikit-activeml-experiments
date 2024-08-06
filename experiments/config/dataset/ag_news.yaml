@@ -3,6 +3,7 @@ class_definition:
   _target_: datasets.load_dataset
   path: "fancyzhx/ag_news"
   trust_remote_code: True
+  data_dir: "data"
 params:
   test_size: 0.3
 classes: 4

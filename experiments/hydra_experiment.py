@@ -4,7 +4,6 @@ import hydra
 from hydra.utils import instantiate
 import numpy as np
 import time
-import platform
 import warnings
 warnings.filterwarnings("ignore")
 import os
@@ -19,9 +18,7 @@ from util import get_transformer_by_name
 import cpuinfo
 
 import torch
-import torchvision.transforms as transforms
 from torch.utils.data import  DataLoader
-#TODO cifar10, letter, trec6, log_reg, random_forest, uncertainty, random, 
 
 def load_dataset_X_y(filepath):
     X = np.load(f'{filepath}_X.npy', allow_pickle=True)
@@ -29,7 +26,7 @@ def load_dataset_X_y(filepath):
     return X, y
 
 
-def load_torch_dataset(loader, root_dir, split_dict, dataset_name, download=True):
+def load_torch_dataset(loader, root_dir, split_dict, backbone_name, download=True):
     """
     Load and process a given dataset for training or validation.
 
@@ -41,7 +38,7 @@ def load_torch_dataset(loader, root_dir, split_dict, dataset_name, download=True
     Returns:
     - dataset (torch.ndarray): The dataset.
     """
-    transformer = get_transformer_by_name("dinov2_vitb14")
+    transformer = get_transformer_by_name(backbone_name)
     dataset = instantiate(loader, root=root_dir, download=download, transform=transformer, **split_dict)
     return dataset
 
@@ -62,8 +59,11 @@ def process_dataset(dataset, is_train, model_emb, batch_size=4, num_workers=4, d
     dataloaders = []
     # Create DataLoader
     if is_train is None:
-        for split in dataset.keys():
-            dataloaders.append(DataLoader(dataset[split], batch_size=batch_size, num_workers=num_workers))
+        if hasattr(dataset, "keys"):
+            for split in dataset.keys():
+                dataloaders.append(DataLoader(dataset[split], batch_size=batch_size, num_workers=num_workers))
+        else:
+            dataloaders.append(DataLoader(dataset, batch_size=batch_size, shuffle=is_train, num_workers=num_workers))
     else:
         dataloaders.append(DataLoader(dataset, batch_size=batch_size, shuffle=is_train, num_workers=num_workers))
     embedding_list = []
@@ -79,7 +79,11 @@ def process_dataset(dataset, is_train, model_emb, batch_size=4, num_workers=4, d
                 for i, data in enumerate(dataloader):
                     if i % 10==0:
                         print(len(dataloader), i)
-                    image, label = data
+                    if features_name is None:
+                        image, label = data
+                    else:
+                        image = data[features_name]
+                        label = data[label_name]
                     embeddings = model_emb(image.to(device)).cpu()
                     single_embedding_list.append(embeddings)
                     single_label_list.append(label)
@@ -168,6 +172,13 @@ def my_app(cfg: DictConfig) -> None:
         X, y = load_dataset_X_y(experiment_base_path)
     else:
         print("No cache found for : " + dataset_name )
+
+        features_name = None
+        label_name = None
+        if hasattr(cfg.dataset, "features_name"):
+            features_name = cfg.dataset.features_name
+            label_name = cfg.dataset.label_name
+
         # Load dataset using the method saved in the dataset config
         data_loader_str = str(cfg.dataset.class_definition._target_).split(".")[0]
         if data_loader_str == "sklearn" or data_loader_str == "openml":
@@ -179,16 +190,15 @@ def my_app(cfg: DictConfig) -> None:
                 X_df, y = dataset_tmp
             X = X_df.values
         elif data_loader_str == "datasets":
-            dataset = instantiate(cfg.dataset.class_definition, data_dir=data_dir)
+            dataset = instantiate(cfg.dataset.class_definition)
+            # TODO: Fix cats_vs_dogs dataset
+            # transformer = get_transformer_by_name(embeddings_model)
+            # if transformer is not None:
+            #     dataset.with_format("torch")
         elif data_loader_str == "torchvision":
-            dataset_train = load_torch_dataset(loader=cfg.dataset.class_definition, root_dir=data_dir, split_dict=cfg.dataset.train_params, dataset_name=dataset_name, download=cache)
-            dataset_eval = load_torch_dataset(loader=cfg.dataset.class_definition, root_dir=data_dir, split_dict=cfg.dataset.eval_params, dataset_name=dataset_name, download=cache)
+            dataset_train = load_torch_dataset(loader=cfg.dataset.class_definition, root_dir=data_dir, split_dict=cfg.dataset.train_params, backbone_name=embeddings_model, download=cache)
+            dataset_eval = load_torch_dataset(loader=cfg.dataset.class_definition, root_dir=data_dir, split_dict=cfg.dataset.eval_params, backbone_name=embeddings_model, download=cache)     
         
-        features_name = None
-        label_name = None
-        if hasattr(cfg.dataset, "features_name"):
-            features_name = cfg.dataset.features_name
-            label_name = cfg.dataset.label_name
 
         # If a backbone is given load and use backbone on dataset_train and dataset_eval
         if hasattr(cfg, "backbone"):

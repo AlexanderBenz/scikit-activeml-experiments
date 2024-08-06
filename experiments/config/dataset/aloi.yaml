@@ -1,4 +1,4 @@
-name: "pendigits"
+name: "aloi"
 class_definition:
   _target_: sklearn.datasets.fetch_openml
   data_id: 42396

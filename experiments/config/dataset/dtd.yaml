@@ -1,4 +1,4 @@
-name: "cifar10"
+name: "dtd"
 class_definition:
   _target_: torchvision.datasets.DTD
 params:
