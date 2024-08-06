@@ -10,13 +10,15 @@ import os
 
 # available selections
 
-qs_strategies = ["random", "UncertaintySampling", "probabilistic_active_learning"]
-models = ["logistic_regression", "parzen_window_classifier", "random_forest_tree"]
-datasets_image = ["cifar10"]
-datasets_text = ["trec6"]
-datasets_tabular = ["iris"]
-datasets = datasets_image + datasets_text + datasets_tabular
-batch_sizes = [1,10,25,50,100,1000]
+def load_options():
+    filepath = Path(__file__).parent / "experiments.csv"
+    df = pd.read_csv(filepath, dtype=str)
+    qs_strategies = sorted(df['qs_strategy'].unique())
+    models = sorted(df['model'].unique())
+    datasets = sorted(df['dataset'].unique())
+    batch_sizes = sorted(df['batch_size'].unique())
+    return qs_strategies, models, datasets, batch_sizes
+qs_strategies, models, datasets, batch_sizes = load_options()
 
 # initialies selected list
 
@@ -44,7 +46,6 @@ def to_dict(lst):
 
 
 
-
 app_ui = ui.page_fluid(
     ui.input_dark_mode(),
     ui.layout_sidebar(
@@ -53,19 +54,19 @@ app_ui = ui.page_fluid(
             ui.hr(),
             "When selecting None all are selected",
             ui.input_checkbox_group(  
-                "qs_strategies",  
-                "Query Strategies",  
-                to_dict(qs_strategies),  
-            ),
-            ui.input_checkbox_group(  
-                "models",  
-                "models",  
-                to_dict(models),  
-            ),
-            ui.input_checkbox_group(  
                 "datasets",  
                 "Datasets",  
                 to_dict(datasets),  
+            ),
+            ui.input_checkbox_group(  
+                "models",  
+                "Models",  
+                to_dict(models),  
+            ),
+            ui.input_checkbox_group(  
+                "qs_strategies",  
+                "Query Strategies",  
+                to_dict(qs_strategies),  
             ),
             ui.input_checkbox_group(  
                 "batch_sizes",  
@@ -78,7 +79,10 @@ app_ui = ui.page_fluid(
             
         ),
         ui.output_ui("rows"),
-        ui.output_data_frame("datatable"),
+        ui.page_fluid(
+            ui.output_data_frame("datatable"),
+        ),
+        
     ),
     ui.layout_column_wrap(
         ui.input_action_button("generate_plots", "Generate plots"),
@@ -162,7 +166,7 @@ def server(input, output, session):
     @reactive.event(input.action_button)
     def datatable():
         load_df()
-        return render.DataTable(experiments_df.get(), selection_mode="rows") 
+        return render.DataTable(experiments_df.get(), selection_mode="rows", width='fit-page', height='fit-page') 
     
     @render.ui
     def rows():

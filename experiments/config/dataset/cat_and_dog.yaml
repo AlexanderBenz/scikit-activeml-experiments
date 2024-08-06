@@ -1,0 +1,12 @@
+name: "cat_and_dog"
+class_definition:
+  _target_: datasets.load_dataset
+  path: "Bingsu/Cat_and_Dog"
+  trust_remote_code: True
+params:
+  test_size: 0.3
+classes: 2
+features_name: "image"
+label_name: "labels" 
+dataloader_batch_size: 8
+num_workers: 4

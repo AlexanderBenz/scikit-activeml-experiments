@@ -1,0 +1,5 @@
+name: "ProbabilisticAL"
+class_definition:
+  _target_: skactiveml.pool.ProbabilisticAL
+params:
+  metric: "rbf"

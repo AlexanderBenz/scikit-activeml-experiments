@@ -1,0 +1,8 @@
+name: "pendigits"
+class_definition:
+  _target_: sklearn.datasets.fetch_openml
+  data_id: 32
+  data_home: .data_cache
+params:
+  test_size: 0.3
+classes: 10

@@ -1,6 +1,8 @@
 name: "flowers-102"
 class_definition:
   _target_: torchvision.datasets.Flowers102
+params:
+  test_size: 0.3
 train_params:
   split: 'train' 
 eval_params:

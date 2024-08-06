@@ -1,0 +1,6 @@
+name: "TypiClust"
+class_definition:
+  _target_: skactiveml.pool.CoreSet
+params:
+  n_cluster_param_name: "n_clusters"
+  k: 5

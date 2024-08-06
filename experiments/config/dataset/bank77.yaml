@@ -1,0 +1,12 @@
+name: "banking77"
+class_definition:
+  _target_: datasets.load_dataset
+  path: "PolyAI/banking77"
+  trust_remote_code: True
+params:
+  test_size: 0.3
+classes: 77
+features_name: "text"
+label_name: "label" 
+dataloader_batch_size: 8
+num_workers: 4

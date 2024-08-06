@@ -1,0 +1,5 @@
+name: "CoreSet"
+class_definition:
+  _target_: skactiveml.pool.CoreSet
+params:
+  null

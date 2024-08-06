@@ -1,4 +1,4 @@
-name: "uncertainty_sampling"
+name: "USLeastConfident"
 class_definition:
   _target_: skactiveml.pool.UncertaintySampling
 params:

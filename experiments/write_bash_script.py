@@ -1,7 +1,6 @@
 '''
 This Python script writes the Bash scripts for reproducing the results of the hyperparameter and benchmark study.
 Before executing this script.
-Original code from https://github.com/ies-research/multi-annotator-machine-learning/blob/main/empirical_evaluation/python_scripts/write_bash_scripts.py
 '''
 import os
 from itertools import product
@@ -87,13 +86,13 @@ def write_commands(
         f"#SBATCH --output={slurm_logs_path}/{job_name}_%A_%a.log",
     ]
     if cfg_dict["accelerator"] == "gpu":
-            commands += [
+            commands_to_save += [
                 f"#SBATCH --gres=gpu:1",
                 f'eval "$(sed -n "$(($SLURM_ARRAY_TASK_ID+{13})) p" {filename})"',
                 f"exit 0",
             ]
     else:
-        commands += [
+        commands_to_save += [
             f'eval "$(sed -n "$(($SLURM_ARRAY_TASK_ID+{12})) p" {filename})"',
             f"exit 0",
         ]
@@ -109,17 +108,19 @@ if __name__ == "__main__":
     path_python_file = "hydra_experiment.py"# "your/absolute/path/to/perform_experiment.py"
     directory = "./bash_scripts/"# "your/absolute/path/to/bash_scripts/"
     use_slurm = True
-    mem = "10gb"
-    max_n_parallel_jobs = 110
+    mem = "16gb"
+    max_n_parallel_jobs = 50
     cpus_per_task = 4
     accelerator = "gpu"
-    slurm_logs_path = ""
+    slurm_logs_path = "log_slurm"
 
     # List of seeds to ensure reproducibility.
     seeds = list(range(10))
 
     dataset_with_backbone = [
-        ("cifar10", "dino_head"), ("trec6", "bert_base"), ("letter", None),
+        ("cifar10", "dino_head"), ("cat_and_dog", "dino_head"), ("cifar100", "dino_head"), ("dtd", "dino_head"),
+        ("ag_news", "bert_base"), ("bank77", "bert_base"), ("DBpendia", "bert_base"), ("trec6", "bert_base"),
+        ("letter", None), ("iris", None), ("pendigits", None), ("aloi", None),
     ]
     # ================================= Create bash scripts for downloading datasets. ================================
     # Note: The experiment will throw an error after downloading the dataset and caching it.
@@ -151,20 +152,27 @@ if __name__ == "__main__":
     )
 
     # ================================= Create bash scripts for benchmark. ============================================
-    classifiers = [
-        "random_sampling",
-        "uncertainty_sampling",
-    ]
-    dataset_with_backbone = [
-        ("cifar10", "dino_head"), ("trec6", "bert_base"), ("letter", None),
-    ]
+    
+    # Only use if download file differs from benchmark
+    # dataset_with_backbone = [
+    #     ("cifar10", "dino_head"), ("trec6", "bert_base"), ("letter", None),
+    # ]
     models = [
         "logistic_regression", "random_forest"
     ]
     query_strategies = [
-        "random_sampling", "uncertainty_sampling"
+        "random_sampling",
+        "uncertainty_sampling query_strategy.params.method='least_confident' query_strategy.name=USLeastConfident",
+        "uncertainty_sampling query_strategy.params.method='margin_sampling' query_strategy.name=USMargin",
+        "uncertainty_sampling query_strategy.params.method='entropy' query_strategy.name=USEntropy",
+        "badge",
+        "core_set",
+        "typi_clust",
+        "greedy_sampling_x",
+        "probabilistic_al",
+        "alce",
     ]
-    batch_sizes = [1]
+    batch_sizes = [1,10,50]
     accelerator = "cpu"
     
     config_combs = []

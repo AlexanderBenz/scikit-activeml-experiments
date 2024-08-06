@@ -1,0 +1,12 @@
+name: "dbpedia"
+class_definition:
+  _target_: datasets.load_dataset
+  path: "fancyzhx/dbpedia_14"
+  trust_remote_code: True
+params:
+  test_size: 0.3
+classes: 14
+features_name: "content"
+label_name: "label" 
+dataloader_batch_size: 8
+num_workers: 4

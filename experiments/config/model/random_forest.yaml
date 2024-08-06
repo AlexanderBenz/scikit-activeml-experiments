@@ -1,4 +1,4 @@
-name: "random_forest"
+name: "RandomForestClassifier"
 class_definition:
   _target_: sklearn.ensemble.RandomForestClassifier
 params:

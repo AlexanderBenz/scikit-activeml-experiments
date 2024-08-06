@@ -292,7 +292,6 @@ def my_app(cfg: DictConfig) -> None:
         'time': [],
     }
     query_indices = []
-    filepath = create_folders(params=params)
 
     # ======== Begin experiment =========
     for c in range(n_cycles):
@@ -326,9 +325,13 @@ def my_app(cfg: DictConfig) -> None:
         metric_dict['average_precision'].append(np.round(average_precision, decimals=decimals))
         metric_dict['balanced_accuracy'].append(np.round(balanced_accuracy, decimals=decimals))
         metric_dict['time'].append(np.round(end - start, decimals=decimals))
+        # stop learning cycle if all samples are aquired
+        if len(X_train) <= c*batch_size:
+            break
 
     # ======== Save experiment results =========
     # Save metric_dict using the experiments parameters
+    filepath = create_folders(params=params)
     df = pd.DataFrame.from_dict(data=metric_dict)
     outpath = os.path.join(filepath, f"{params['seed']}.csv")
     df.to_csv(outpath, index=True, index_label="step")
