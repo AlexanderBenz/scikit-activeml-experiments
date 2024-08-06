@@ -1,7 +1,7 @@
 name: "iris"
 class_definition:
   _target_: sklearn.datasets.fetch_openml
-  dataset_id: 61
+  data_id: 61
   data_home: .data_cache
 params:
   test_size: 0.3

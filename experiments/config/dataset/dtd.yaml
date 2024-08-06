@@ -4,9 +4,9 @@ class_definition:
 params:
   test_size: 0.3
 train_params:
-  train: 'train'
+  split : 'train'
 eval_params:
-  train: 'val'  
+  split : 'val'  
 num_workers: 4
 dataloader_batch_size: 32
 classes: 10

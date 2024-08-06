@@ -25,6 +25,17 @@ def load_dataset_X_y(filepath):
     y = np.load(f'{filepath}_y.npy', allow_pickle=True)
     return X, y
 
+class dataloader_class():
+    def __init__(self, transformer, features_name, label_name):
+        self.transformer = transformer
+        self.features_name = features_name
+        self.label_name = label_name
+
+    def collate_fn(self, batch):
+        return {
+            self.features_name: torch.stack([self.transformer(x[self.features_name]) for x in batch]),
+            self.label_name: torch.tensor([x[self.label_name] for x in batch])
+        }
 
 def load_torch_dataset(loader, root_dir, split_dict, backbone_name, download=True):
     """
@@ -42,7 +53,7 @@ def load_torch_dataset(loader, root_dir, split_dict, backbone_name, download=Tru
     dataset = instantiate(loader, root=root_dir, download=download, transform=transformer, **split_dict)
     return dataset
 
-def process_dataset(dataset, is_train, model_emb, batch_size=4, num_workers=4, device="cpu", tokenizer=None, features_name=None, label_name=None):
+def process_dataset(dataset, is_train, model_emb, batch_size=4, num_workers=4, device="cpu", tokenizer=None, features_name=None, label_name=None, collate_fn=None):
     """
     Load and process a given dataset for training or validation.
 
@@ -63,7 +74,7 @@ def process_dataset(dataset, is_train, model_emb, batch_size=4, num_workers=4, d
             for split in dataset.keys():
                 dataloaders.append(DataLoader(dataset[split], batch_size=batch_size, num_workers=num_workers))
         else:
-            dataloaders.append(DataLoader(dataset, batch_size=batch_size, shuffle=is_train, num_workers=num_workers))
+            dataloaders.append(DataLoader(dataset, batch_size=batch_size, shuffle=is_train, num_workers=num_workers, collate_fn=collate_fn))
     else:
         dataloaders.append(DataLoader(dataset, batch_size=batch_size, shuffle=is_train, num_workers=num_workers))
     embedding_list = []
@@ -175,6 +186,7 @@ def my_app(cfg: DictConfig) -> None:
 
         features_name = None
         label_name = None
+        collate_fn = None
         if hasattr(cfg.dataset, "features_name"):
             features_name = cfg.dataset.features_name
             label_name = cfg.dataset.label_name
@@ -191,10 +203,11 @@ def my_app(cfg: DictConfig) -> None:
             X = X_df.values
         elif data_loader_str == "datasets":
             dataset = instantiate(cfg.dataset.class_definition)
-            # TODO: Fix cats_vs_dogs dataset
-            # transformer = get_transformer_by_name(embeddings_model)
-            # if transformer is not None:
-            #     dataset.with_format("torch")
+            # TODO: Generate a callate_fn to transform image data outside of torch
+            transformer = get_transformer_by_name(embeddings_model)
+            if transformer is not None:
+                collate_fn = dataloader_class(transformer, features_name, label_name).collate_fn
+            
         elif data_loader_str == "torchvision":
             dataset_train = load_torch_dataset(loader=cfg.dataset.class_definition, root_dir=data_dir, split_dict=cfg.dataset.train_params, backbone_name=embeddings_model, download=cache)
             dataset_eval = load_torch_dataset(loader=cfg.dataset.class_definition, root_dir=data_dir, split_dict=cfg.dataset.eval_params, backbone_name=embeddings_model, download=cache)     
@@ -225,7 +238,7 @@ def my_app(cfg: DictConfig) -> None:
                 X = np.append(X_train, X_test, axis=0)
                 y = np.append(y_train_true, y_test_true, axis=0)
             else:
-                X, y = process_dataset(dataset=dataset, is_train=None, model_emb=model_emb, batch_size=dataloader_batch_size, num_workers=num_workers, device=device, tokenizer=tokenizer, features_name=features_name, label_name=label_name)
+                X, y = process_dataset(dataset=dataset, is_train=None, model_emb=model_emb, batch_size=dataloader_batch_size, num_workers=num_workers, device=device, tokenizer=tokenizer, features_name=features_name, label_name=label_name, collate_fn=collate_fn)
         else:
             # If no embeding is needed and X and y are not saved using the loading method
             if dataset_eval is not None:
