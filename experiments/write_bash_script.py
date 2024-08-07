@@ -108,7 +108,7 @@ if __name__ == "__main__":
     path_python_file = "hydra_experiment.py"# "your/absolute/path/to/perform_experiment.py"
     directory = "./bash_scripts/"# "your/absolute/path/to/bash_scripts/"
     use_slurm = True
-    mem = "16gb"
+    mem = "20gb"
     max_n_parallel_jobs = 50
     cpus_per_task = 4
     accelerator = "gpu"
@@ -158,7 +158,7 @@ if __name__ == "__main__":
     #     ("cifar10", "dino_head"), ("trec6", "bert_base"), ("letter", None),
     # ]
     models = [
-        "logistic_regression", "random_forest"
+        "logistic_regression", "random_forest", "parzen_window_classifier"
     ]
     query_strategies = [
         "random_sampling",
@@ -173,12 +173,12 @@ if __name__ == "__main__":
         "alce",
     ]
     batch_sizes = [1,10,50]
+    mem = "16gb"
     accelerator = "cpu"
     
-    config_combs = []
-    job_name = "experiments"
     for dataset, backbone in dataset_with_backbone:
-        config_combs.append(
+        job_name = dataset
+        config_combs = [
             {
                 "dataset": dataset,
                 "backbone": backbone,
@@ -190,15 +190,15 @@ if __name__ == "__main__":
                     "batch_size": batch_sizes,
                 },
             },
+        ]
+        write_commands(
+            path_python_file=path_python_file,
+            directory=directory,
+            config_combs=config_combs,
+            slurm_logs_path=slurm_logs_path,
+            max_n_parallel_jobs=max_n_parallel_jobs,
+            mem=mem,
+            cpus_per_task=cpus_per_task,
+            use_slurm=use_slurm,
+            job_name=job_name,
         )
-    write_commands(
-        path_python_file=path_python_file,
-        directory=directory,
-        config_combs=config_combs,
-        slurm_logs_path=slurm_logs_path,
-        max_n_parallel_jobs=max_n_parallel_jobs,
-        mem=mem,
-        cpus_per_task=cpus_per_task,
-        use_slurm=use_slurm,
-        job_name=job_name,
-    )

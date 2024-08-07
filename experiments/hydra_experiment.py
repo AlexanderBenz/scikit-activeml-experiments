@@ -18,6 +18,7 @@ from util import get_transformer_by_name
 import cpuinfo
 
 import torch
+from torchvision.transforms import v2
 from torch.utils.data import  DataLoader
 
 def load_dataset_X_y(filepath):
@@ -30,12 +31,19 @@ class dataloader_class():
         self.transformer = transformer
         self.features_name = features_name
         self.label_name = label_name
+        self.transform_to_rgb = v2.RGB()
 
     def collate_fn(self, batch):
         return {
             self.features_name: torch.stack([self.transformer(x[self.features_name]) for x in batch]),
             self.label_name: torch.tensor([x[self.label_name] for x in batch])
         }
+    
+    def to_rgb_transformer(self, batch):
+        return {
+                self.features_name: self.transform_to_rgb(batch[self.features_name]),
+                self.label_name: batch[self.label_name]
+            }
 
 def load_torch_dataset(loader, root_dir, split_dict, backbone_name, download=True):
     """
@@ -206,7 +214,9 @@ def my_app(cfg: DictConfig) -> None:
             # TODO: Generate a callate_fn to transform image data outside of torch
             transformer = get_transformer_by_name(embeddings_model)
             if transformer is not None:
-                collate_fn = dataloader_class(transformer, features_name, label_name).collate_fn
+                dl_class = dataloader_class(transformer, features_name, label_name)
+                collate_fn = dl_class.collate_fn
+                dataset.set_transform(dl_class.to_rgb_transformer)
             
         elif data_loader_str == "torchvision":
             dataset_train = load_torch_dataset(loader=cfg.dataset.class_definition, root_dir=data_dir, split_dict=cfg.dataset.train_params, backbone_name=embeddings_model, download=cache)

@@ -1,0 +1,6 @@
+name: "ParzenWindowClassifier"
+class_definition:
+  _target_: skactiveml.classifier.ParzenWindowClassifier
+params:
+  metric: "rbf"
+  class_prior: 0.0

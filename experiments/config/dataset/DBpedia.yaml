@@ -9,5 +9,5 @@ params:
 classes: 14
 features_name: "content"
 label_name: "label" 
-dataloader_batch_size: 8
+dataloader_batch_size: 4
 num_workers: 4
