@@ -297,7 +297,8 @@ def my_app(cfg: DictConfig) -> None:
         clf = SklearnClassifier(instantiate(cfg.model.class_definition, **model_params), random_state=gen_seed(master_random_state), classes=np.arange(classes))
     else:
         clf = instantiate(cfg.model.class_definition, random_state=gen_seed(master_random_state), classes=np.arange(classes), **model_params)
-    
+    if hasattr(qs_params, "classes"):
+        qs_params["classes"]= np.arange(classes)
     qs = SubSamplingWrapper(instantiate(cfg.query_strategy.class_definition, random_state=gen_seed(master_random_state), **qs_params), max_candidates=cfg.n_max_candidates, random_state=gen_seed(master_random_state))
     y_train = np.full(shape=y_train_true.shape, fill_value=MISSING_LABEL)
     clf.fit(X_train, y_train)

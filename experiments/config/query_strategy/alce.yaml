@@ -2,4 +2,4 @@ name: "Alce"
 class_definition:
   _target_: skactiveml.pool.CostEmbeddingAL
 params:
-  null
+  classes: ""

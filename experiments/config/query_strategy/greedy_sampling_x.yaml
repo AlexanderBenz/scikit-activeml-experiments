@@ -2,4 +2,4 @@ name: "GreedySamplingX"
 class_definition:
   _target_: skactiveml.pool.GreedySamplingX
 params:
-  metric: ”euclidean”
+  metric: euclidean
