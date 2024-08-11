@@ -342,12 +342,17 @@ def my_app(cfg: DictConfig) -> None:
         y_test_proba = clf.predict_proba(X_test)
         
         score = accuracy_score(y_test_true,y_test_pred) 
-        auroc = roc_auc_score(y_test_true, y_test_proba, multi_class='ovr')
+        if classes <= 2:
+            auroc = roc_auc_score(y_test_true, y_test_proba[:,1])
+            y_true_proba = np.array([y_p[y_t] for y_p, y_t in zip(y_test_proba, y_test_true)])
+            average_precision = average_precision_score(y_test_true, y_true_proba)
+        else:
+            auroc = roc_auc_score(y_test_true, y_test_proba, multi_class='ovr')
+            average_precision = average_precision_score(y_test_true, y_test_proba)
         f1_micro = f1_score(y_test_true, y_test_pred, average='micro')
         f1_macro = f1_score(y_test_true, y_test_pred, average='macro')
         neg_brier_score = neg_brier_score_(y_test_proba, y_test_true)
         neg_log_loss = log_loss(y_test_true, y_test_proba)
-        average_precision = average_precision_score(y_test_true, y_test_proba)
         balanced_accuracy = balanced_accuracy_score(y_test_true, y_test_pred)
         # save metrics
         metric_dict['accuracy'].append(np.round(score, decimals=decimals))
