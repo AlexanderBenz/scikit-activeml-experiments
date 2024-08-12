@@ -7,11 +7,17 @@ from pathlib import Path
 # import mlflow
 import pandas as pd
 import os
+import urllib.request
+import urllib3
+from io import StringIO
+
+app_dir = Path(__file__).parent
+# db_file = app_dir / "weather.db"
 
 # available selections
 
 def load_options():
-    filepath = Path(__file__).parent / "experiments.csv"
+    filepath = app_dir / "experiments.csv"
     df = pd.read_csv(filepath, dtype=str)
     qs_strategies = sorted(df['qs_strategy'].unique())
     models = sorted(df['model'].unique())
@@ -36,6 +42,7 @@ experiments_df = reactive.value([])
 all_experiments_df = reactive.value()
 selected_df = reactive.value([])
 list_expirement_metrics = reactive.value([])
+selected_df_list = reactive.value([])
 
 
 # generate dictionaries
@@ -93,7 +100,7 @@ app_ui = ui.page_fluid(
         output_widget("auroc_plot"),
         output_widget("f1_micro"),
         output_widget("f1_macro"),
-        # ui.output_plot("neg_brier_score"),
+        output_widget("neg_brier_score"),
         output_widget("neg_log_loss"),
         output_widget("average_precision"),
         output_widget("balanced_accuracy"),
@@ -108,8 +115,7 @@ app_ui = ui.page_fluid(
 
 def server(input, output, session):
 
-    @reactive.event(input.generate_plots)
-    def load_selected_df():
+    def load_experiment():
         expe_df = experiments_df.get().values
         all_exp_df = all_experiments_df.get()
         sel_dataframe = expe_df[list(selected_experiments.get())]
@@ -119,21 +125,60 @@ def server(input, output, session):
         selected_dataframes_list = selected_dataframes_list.loc[selected_dataframes_list['batch_size'].isin(sel_dataframe[:,3])]
         selected_dataframes_list = selected_dataframes_list.values
         list_expirement_metrics.set(sel_dataframe)
-        
         df = []
         old_path = ""
+        http = urllib3.PoolManager(num_pools=1)
         for selected_dataframe in selected_dataframes_list:
+            filespath = app_dir / experiment_path
+            current_path = "/".join(selected_dataframe[:4])
+            # os.makedirs(filespath.__str__() + "/" + current_path, exist_ok=True)
+            url_path = "/".join(selected_dataframe)
+            csv_url = f"https://raw.githubusercontent.com/AlexanderBenz/scikit-activeml-experiments/main/experiments/experiments_results/{url_path}"
+            # local_file_path = filespath.__str__() + "/" + "/".join(selected_dataframe)
+            tmp = http.request("GET", csv_url, timeout=0.2)
             
-            filespath = Path(__file__).parent / experiment_path
-            current_path = "\\".join(selected_dataframe[:4])
+            # open(local_file_path, 'a').close()
+            # urllib.request.urlretrieve(csv_url, local_file_path)
             # If you run shiny localy raplace the + with + "/" +
-            filespath = filespath.__str__() + "\\".join(selected_dataframe)
+            # filespath = filespath.__str__() + "\\".join(selected_dataframe)
+            # if old_path != current_path:
+            #     df.append([])
+            # df[-1].append(pd.read_csv(local_file_path))
+
             if old_path != current_path:
                 df.append([])
-            df[-1].append(pd.read_csv(filespath))
+            df[-1].append(pd.read_csv(StringIO(tmp.data.decode("utf-8")), index_col="step"))
+
             old_path = current_path
-            
         selected_df.set(df)
+
+    # def load_selected_df():
+
+    #     expe_df = experiments_df.get().values
+    #     all_exp_df = all_experiments_df.get()
+    #     sel_dataframe = expe_df[list(selected_experiments.get())]
+    #     selected_dataframes_list = all_exp_df.loc[all_exp_df['dataset'].isin(sel_dataframe[:,0])]
+    #     selected_dataframes_list = selected_dataframes_list.loc[selected_dataframes_list['model'].isin(sel_dataframe[:,1])]
+    #     selected_dataframes_list = selected_dataframes_list.loc[selected_dataframes_list['qs_strategy'].isin(sel_dataframe[:,2])]
+    #     selected_dataframes_list = selected_dataframes_list.loc[selected_dataframes_list['batch_size'].isin(sel_dataframe[:,3])]
+    #     selected_dataframes_list = selected_dataframes_list.values
+    #     list_expirement_metrics.set(sel_dataframe)
+    #     selected_df_list.set(selected_dataframes_list)
+        
+    #     df = []
+    #     old_path = ""
+    #     for selected_dataframe in selected_dataframes_list:
+            
+    #         filespath = app_dir / experiment_path
+    #         current_path = "\\".join(selected_dataframe[:4])
+    #         # If you run shiny localy raplace the + with + "/" +
+    #         filespath = filespath.__str__() + "\\".join(selected_dataframe)
+    #         if old_path != current_path:
+    #             df.append([])
+    #         df[-1].append(pd.read_csv(filespath))
+    #         old_path = current_path
+            
+    #     selected_df.set(df)
 
     # load selected dataframes
     @reactive.event(input.action_button)
@@ -142,7 +187,7 @@ def server(input, output, session):
         selected_models_list = input.models()
         selected_qs_list = input.qs_strategies()
         selected_batch_sizes_list = input.batch_sizes()
-        filepath = Path(__file__).parent / "experiments.csv"
+        filepath = app_dir / "experiments.csv"
         df = pd.read_csv(filepath, dtype=str)
         if len(selected_datasets_list) > 0:
             df = df.loc[df['dataset'].isin(selected_datasets_list)]
@@ -153,6 +198,7 @@ def server(input, output, session):
         if len(selected_batch_sizes_list) > 0:
             df = df.loc[df['batch_size'].isin(selected_batch_sizes_list)]
         all_experiments_df.set(df)
+
         df = df[["dataset", "model", "qs_strategy", "batch_size"]].drop_duplicates()
 
         experiments_df.set(df)
@@ -221,8 +267,8 @@ def server(input, output, session):
     # @render.plot(alt="Accuracy graph")
     @render_widget
     @reactive.event(input.generate_plots)
-    def acc_plot(): 
-        load_selected_df()
+    def acc_plot():
+        load_experiment()
         return create_fig("accuracy")
 
     # @render.plot(alt="Auroc graph")
@@ -243,11 +289,10 @@ def server(input, output, session):
     def f1_macro(): 
         return create_fig("f1_macro")  
     
-    # @render.plot(alt="neg_brier_score graph")
-    # @reactive.event(input.generate_plots)
-    # def neg_brier_score(): 
-    #     load_selected_df()
-    #     return create_fig("neg_brier_score")  
+    @render_widget
+    @reactive.event(input.generate_plots)
+    def neg_brier_score(): 
+        return create_fig("neg_brier_score")  
 
     # @render.plot(alt="neg_log_loss graph")
     @render_widget

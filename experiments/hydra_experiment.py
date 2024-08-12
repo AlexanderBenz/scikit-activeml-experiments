@@ -26,7 +26,7 @@ def load_dataset_X_y(filepath):
     y = np.load(f'{filepath}_y.npy', allow_pickle=True)
     return X, y
 
-class dataloader_class():
+class DataloaderClass():
     def __init__(self, transformer, features_name, label_name):
         self.transformer = transformer
         self.features_name = features_name
@@ -214,7 +214,7 @@ def my_app(cfg: DictConfig) -> None:
             # TODO: Generate a callate_fn to transform image data outside of torch
             transformer = get_transformer_by_name(embeddings_model)
             if transformer is not None:
-                dl_class = dataloader_class(transformer, features_name, label_name)
+                dl_class = DataloaderClass(transformer, features_name, label_name)
                 collate_fn = dl_class.collate_fn
                 dataset.set_transform(dl_class.to_rgb_transformer)
             
