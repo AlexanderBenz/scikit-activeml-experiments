@@ -11,9 +11,9 @@ files_dict = {
     'seed': [],
 }
 
-experiment_folder = "src_shiny_app/experiments_results/"
+experiment_folder = "experiments/experiments_results/"
 
-def get_file(files_dict, path="src_shiny_app/"):
+def get_file(files_dict, path="experiments/"):
     datasets = os.listdir(path)
     for dataset in datasets:
         model_folders = os.path.join(path, dataset)
