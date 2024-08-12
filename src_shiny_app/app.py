@@ -4,10 +4,7 @@ import plotly.graph_objects as go
 import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path
-# import mlflow
 import pandas as pd
-import os
-import urllib.request
 import urllib3
 from io import StringIO
 
@@ -111,8 +108,6 @@ app_ui = ui.page_fluid(
     
 )
 
-# TODO: load selected chenbox with query_stragies = df['qs_strategy'].unique() ..
-
 def server(input, output, session):
 
     def load_experiment():
@@ -129,21 +124,10 @@ def server(input, output, session):
         old_path = ""
         http = urllib3.PoolManager(num_pools=1)
         for selected_dataframe in selected_dataframes_list:
-            filespath = app_dir / experiment_path
             current_path = "/".join(selected_dataframe[:4])
-            # os.makedirs(filespath.__str__() + "/" + current_path, exist_ok=True)
             url_path = "/".join(selected_dataframe)
             csv_url = f"https://raw.githubusercontent.com/AlexanderBenz/scikit-activeml-experiments/main/experiments/experiments_results/{url_path}"
-            # local_file_path = filespath.__str__() + "/" + "/".join(selected_dataframe)
             tmp = http.request("GET", csv_url, timeout=0.2)
-            
-            # open(local_file_path, 'a').close()
-            # urllib.request.urlretrieve(csv_url, local_file_path)
-            # If you run shiny localy raplace the + with + "/" +
-            # filespath = filespath.__str__() + "\\".join(selected_dataframe)
-            # if old_path != current_path:
-            #     df.append([])
-            # df[-1].append(pd.read_csv(local_file_path))
 
             if old_path != current_path:
                 df.append([])
@@ -151,34 +135,6 @@ def server(input, output, session):
 
             old_path = current_path
         selected_df.set(df)
-
-    # def load_selected_df():
-
-    #     expe_df = experiments_df.get().values
-    #     all_exp_df = all_experiments_df.get()
-    #     sel_dataframe = expe_df[list(selected_experiments.get())]
-    #     selected_dataframes_list = all_exp_df.loc[all_exp_df['dataset'].isin(sel_dataframe[:,0])]
-    #     selected_dataframes_list = selected_dataframes_list.loc[selected_dataframes_list['model'].isin(sel_dataframe[:,1])]
-    #     selected_dataframes_list = selected_dataframes_list.loc[selected_dataframes_list['qs_strategy'].isin(sel_dataframe[:,2])]
-    #     selected_dataframes_list = selected_dataframes_list.loc[selected_dataframes_list['batch_size'].isin(sel_dataframe[:,3])]
-    #     selected_dataframes_list = selected_dataframes_list.values
-    #     list_expirement_metrics.set(sel_dataframe)
-    #     selected_df_list.set(selected_dataframes_list)
-        
-    #     df = []
-    #     old_path = ""
-    #     for selected_dataframe in selected_dataframes_list:
-            
-    #         filespath = app_dir / experiment_path
-    #         current_path = "\\".join(selected_dataframe[:4])
-    #         # If you run shiny localy raplace the + with + "/" +
-    #         filespath = filespath.__str__() + "\\".join(selected_dataframe)
-    #         if old_path != current_path:
-    #             df.append([])
-    #         df[-1].append(pd.read_csv(filespath))
-    #         old_path = current_path
-            
-    #     selected_df.set(df)
 
     # load selected dataframes
     @reactive.event(input.action_button)
@@ -246,7 +202,7 @@ def server(input, output, session):
             if use_pl:
                 fig.add_trace(go.Scatter(
                 name=label_name,
-                x=np.arange(0, (len(metric[0]))*batch_size, step=batch_size),
+                x=np.arange(batch_size, (len(metric[0]))*batch_size, step=batch_size),
                 y=errorbar_mean,
                 error_y=dict(
                     type='data', # value of error bar given in data coordinates
@@ -256,7 +212,7 @@ def server(input, output, session):
                 )
                 
             else:
-                ax.errorbar(np.arange(0, (len(metric[0]))*batch_size, step=batch_size), errorbar_mean, errorbar_std, label=label_name, alpha=0.5)
+                ax.errorbar(np.arange(batch_size, (len(metric[0]))*batch_size, step=batch_size), errorbar_mean, errorbar_std, label=label_name, alpha=0.5)
         if use_pl:
             fig.update_layout(title=dict(text=metric_str), xaxis_title=x_label, yaxis_title=y_label)
         else:
