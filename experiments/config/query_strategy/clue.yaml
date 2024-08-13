@@ -1,0 +1,6 @@
+name: "Clue"
+class_definition:
+  _target_: skactiveml.pool.Clue
+params:
+  n_cluster_param_name: n_clusters
+  method: entropy

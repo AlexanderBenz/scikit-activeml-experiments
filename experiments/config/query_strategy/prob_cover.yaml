@@ -1,0 +1,6 @@
+name: "ProbCover"
+class_definition:
+  _target_: skactiveml.pool.ProbCover
+params:
+  alpha: 0.95
+  n_cluster_param_name: n_clusters

@@ -147,4 +147,5 @@ cython_debug/
 /experiments/experiments/
 /experiments/bash_scripts/
 /experiments/cache/
+/experiments/.data_cache/
 docs/

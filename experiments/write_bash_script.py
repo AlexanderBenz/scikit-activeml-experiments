@@ -171,6 +171,9 @@ if __name__ == "__main__":
         "greedy_sampling_x",
         "probabilistic_al",
         "alce",
+        "clue",
+        "contrastive_al",
+        "prob_cover",
     ]
     batch_sizes = [1,10,50]
     mem = "16gb"

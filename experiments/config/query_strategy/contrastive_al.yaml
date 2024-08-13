@@ -1,0 +1,5 @@
+name: "ContrastiveAL"
+class_definition:
+  _target_: skactiveml.pool.ContrastiveAL
+params:
+  eps: 1e-07
