@@ -9,11 +9,11 @@ import urllib3
 from io import StringIO
 
 app_dir = Path(__file__).parent
-# db_file = app_dir / "weather.db"
 
 # available selections
 
 def load_options():
+    """This function loads all available selection for each category"""
     filepath = app_dir / "experiments.csv"
     df = pd.read_csv(filepath, dtype=str)
     qs_strategies = sorted(df['qs_strategy'].unique())
@@ -25,12 +25,10 @@ qs_strategies, models, datasets, batch_sizes = load_options()
 
 # initialies selected list
 
-selected_datasets_list = []
-selected_models_list = []
-selected_qs_list = []
-selected_batch_sizes_list = []
-
-selected_experiments = reactive.value([])
+# selected_datasets_list = []
+# selected_models_list = []
+# selected_qs_list = []
+# selected_batch_sizes_list = []
 
 # initial params
 
@@ -39,17 +37,15 @@ experiments_df = reactive.value([])
 all_experiments_df = reactive.value()
 selected_df = reactive.value([])
 list_expirement_metrics = reactive.value([])
-selected_df_list = reactive.value([])
-
+selected_experiments = reactive.value([])
 
 # generate dictionaries
 
 def to_dict(lst):
-     return {i: i for i in lst}
+    """As the checkbox ui element needs a dictonary convert the lists into dictionaries"""
+    return {i: i for i in lst}
       
-
-
-
+# The app ui functions as the frontpage and includes all input and output Ui ellements
 app_ui = ui.page_fluid(
     ui.input_dark_mode(),
     ui.layout_sidebar(
@@ -101,7 +97,7 @@ app_ui = ui.page_fluid(
         output_widget("neg_log_loss"),
         output_widget("average_precision"),
         output_widget("balanced_accuracy"),
-        # output_widget("acc_plotly"),
+        # output_widget("time"),
         ui.download_button("download", "Download results")
     )
 
@@ -111,6 +107,7 @@ app_ui = ui.page_fluid(
 def server(input, output, session):
 
     def load_experiment():
+        """Function to load the selected expirements to allow the ploting for all metrics"""
         expe_df = experiments_df.get().values
         all_exp_df = all_experiments_df.get()
         sel_dataframe = expe_df[list(selected_experiments.get())]
@@ -139,6 +136,7 @@ def server(input, output, session):
     # load selected dataframes
     @reactive.event(input.action_button)
     def load_df():
+        """Function to load the selectet expirement combinations using the selectet parameters"""
         selected_datasets_list = input.datasets()
         selected_models_list = input.models()
         selected_qs_list = input.qs_strategies()
@@ -161,39 +159,54 @@ def server(input, output, session):
 
     @render.text
     def value():
-        # return ", ".join(input.qs_strategies()) , ", ".join(input.models())
-        return "Please load the Experiments before generating plots", len(list_expirement_metrics.get())
+        return "Please load the Experiments before generating plots.", " Currently selected : " + len(list_expirement_metrics.get())
     
     @render.data_frame
     @reactive.event(input.action_button)
     def datatable():
+        """Display the selected experiment combinations"""
         load_df()
         return render.DataTable(experiments_df.get(), selection_mode="rows", width='fit-page', height='fit-page') 
     
+    
     @render.ui
     def rows():
+        """Ui function to display and save the chosen rows of the experiments. """
         rows = datatable.cell_selection()["rows"]  
         selected = ", ".join(str(i) for i in sorted(rows)) if rows else "None"
         selected_experiments.set(rows)
         return f"Rows selected (select multiple with ctrl): {selected} "
     
     def create_fig(metric_str, x_label="number of samples", y_label=None, use_pl=True):
+        """
+        Function to create plotly plots or matplotlip plots
+
+        Parameters:
+        - metric_str (str): String to select the correct metric from the selected experiments.
+        - x_label (str): Name of the x cordinate.
+        - y_label (str|None): Name of the y cordinate. If none use the metric_str
+        - use_pl (bool): Boolean deciding the plot return. If (True) return a plotly plot else if (False) return a matplotlip plot
+        """
         sel_exp = list_expirement_metrics.get()
+        
         if y_label is None:
             y_label = metric_str
+        # Create a plotly figure of matplotlib figure
         if use_pl:
             fig = go.Figure()
         else:
             fig, ax = plt.subplots()
             ax.set_title(f"{metric_str} graph")
             ax.set_xlabel(x_label)
-            
             ax.set_ylabel(y_label)
 
+        # Itterate through all selected experiments and metrics
         for (df_list, sel) in zip(selected_df.get(),sel_exp):
+            # Save all metrics for each df as most experiments are run on multiple seeds
             metric = []
             for df in df_list:
                 metric.append(df[f"{metric_str}"])
+            # calculate the error bars 
             reshaped_result = np.array(metric).reshape((-1, len(metric[0])))
             errorbar_mean = np.mean(reshaped_result, axis=0)
             errorbar_std = np.std(reshaped_result, axis=0)
@@ -202,7 +215,7 @@ def server(input, output, session):
             if use_pl:
                 fig.add_trace(go.Scatter(
                 name=label_name,
-                x=np.arange(batch_size, (len(metric[0]))*batch_size, step=batch_size),
+                x=np.arange(batch_size, (len(metric[0])+1)*batch_size, step=batch_size),
                 y=errorbar_mean,
                 error_y=dict(
                     type='data', # value of error bar given in data coordinates
@@ -212,13 +225,14 @@ def server(input, output, session):
                 )
                 
             else:
-                ax.errorbar(np.arange(batch_size, (len(metric[0]))*batch_size, step=batch_size), errorbar_mean, errorbar_std, label=label_name, alpha=0.5)
+                ax.errorbar(np.arange(batch_size, (len(metric[0])+1)*batch_size, step=batch_size), errorbar_mean, errorbar_std, label=label_name, alpha=0.5)
         if use_pl:
             fig.update_layout(title=dict(text=metric_str), xaxis_title=x_label, yaxis_title=y_label)
         else:
             ax.legend()
 
         return fig
+    # ------- Widgets to generate the plots ---------
 
     # @render.plot(alt="Accuracy graph")
     @render_widget
@@ -227,19 +241,16 @@ def server(input, output, session):
         load_experiment()
         return create_fig("accuracy")
 
-    # @render.plot(alt="Auroc graph")
     @render_widget
     @reactive.event(input.generate_plots)
     def auroc_plot():
         return create_fig("auroc")  
     
-    # @render.plot(alt="f1_micro graph")
     @render_widget
     @reactive.event(input.generate_plots)
     def f1_micro(): 
         return create_fig("f1_micro")  
     
-    # @render.plot(alt="f1_macro graph")
     @render_widget
     @reactive.event(input.generate_plots)
     def f1_macro(): 
@@ -250,19 +261,16 @@ def server(input, output, session):
     def neg_brier_score(): 
         return create_fig("neg_brier_score")  
 
-    # @render.plot(alt="neg_log_loss graph")
     @render_widget
     @reactive.event(input.generate_plots)
     def neg_log_loss(): 
         return create_fig("neg_log_loss")  
     
-    # @render.plot(alt="average_precision graph")
     @render_widget
     @reactive.event(input.generate_plots)
     def average_precision(): 
         return create_fig("average_precision")  
     
-    # @render.plot(alt="balanced_accuracy graph")
     @render_widget
     @reactive.event(input.generate_plots)
     def balanced_accuracy(): 
@@ -271,8 +279,9 @@ def server(input, output, session):
     # @render_widget
     # @reactive.event(input.generate_plots)
     # def acc_plotly(): 
-    #     return create_fig("accuracy", use_pl=True)  
+    #     return create_fig("time")  
     
+    # generate the download Button
     @render.download(filename="experiemnt_results.csv")
     @reactive.event(input.generate_plots)
     #TODO: look at how to zip the files

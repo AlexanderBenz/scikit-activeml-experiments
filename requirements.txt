@@ -3,5 +3,6 @@ scikit-learn
 scikit-activeml
 hydra-core
 pandas
+py-cpuinfo
 # torch
 # torchvision

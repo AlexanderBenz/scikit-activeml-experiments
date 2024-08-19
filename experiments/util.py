@@ -1,7 +1,10 @@
 import torch
 import torchvision.transforms as transforms
-
+"""
+If a new torch backbone is needed please add them to this file.
+"""
 def get_transformer_by_name(name):
+    """Function to return a transformer based on the backbone model"""
     transformer = None
     if "dinov2" in name:
         transformer = transforms.Compose(

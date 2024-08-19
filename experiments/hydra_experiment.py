@@ -21,12 +21,30 @@ import torch
 from torchvision.transforms import v2
 from torch.utils.data import  DataLoader
 
+# experiment_dir_path = "experiments"
+experiment_dir_path = "experiments_results"
+
 def load_dataset_X_y(filepath):
+    """
+    Load X and y from the file.
+
+    Parameters:
+    - filepath (str) : Filepath to the embedded files.
+    """
     X = np.load(f'{filepath}_X.npy', allow_pickle=True)
     y = np.load(f'{filepath}_y.npy', allow_pickle=True)
     return X, y
 
 class DataloaderClass():
+    """
+    Used to add a a transformer for image datasets. Also transforms grayscaled
+    images into RGB.
+
+    Parameters:
+    - transformer (torchvision.transforms) : Transformer of the backbone model.
+    - features_name (str): Dictonary name for the features.
+    - label_name (str): Dictonary name for the labels.
+    """
     def __init__(self, transformer, features_name, label_name):
         self.transformer = transformer
         self.features_name = features_name
@@ -34,12 +52,33 @@ class DataloaderClass():
         self.transform_to_rgb = v2.RGB()
 
     def collate_fn(self, batch):
+        """
+        Call function used when itterating through the dataloader. Adds
+        transformer bevore returning the batch.
+
+        Parameters:
+        - batch (dataset): Dictonary of the dataset of the given dataloader for 
+        the batch size.
+
+        Returns:
+        - dataset (torch.ndarray): The transformed batch from the dataloader.
+        """
         return {
             self.features_name: torch.stack([self.transformer(x[self.features_name]) for x in batch]),
             self.label_name: torch.tensor([x[self.label_name] for x in batch])
         }
     
     def to_rgb_transformer(self, batch):
+        """
+        Transformer function used when returning the . Adds
+        transformer bevore returning the batch.
+
+        Parameters:
+        - batch (dataset): Dictonary of the dataset for the batch size.
+
+        Returns:
+        - dataset (dataset): The batch dataset RGB transformed.
+        """
         return {
                 self.features_name: self.transform_to_rgb(batch[self.features_name]),
                 self.label_name: batch[self.label_name]
@@ -50,9 +89,11 @@ def load_torch_dataset(loader, root_dir, split_dict, backbone_name, download=Tru
     Load and process a given dataset for training or validation.
 
     Parameters:
+    - loader (torchvision.datasets) : Torch function to load the dataset.
     - root_dir (str) : Root directory where the dataset will be stored.
-    - is_train (bool) : Boolean indicating whether the dataset is for training (True) or validation (False).
-    - batch_size (int) : The batch_size used for the DataLoader.
+    - split_dict (dict) : Dictonary of additinal parameters to download the selected split.
+    - backbone_name (str) : Name for which transformer should be used for the dataloader.
+    - download (bool) : Boolean indicating whether the dataset should be saved localy.
 
     Returns:
     - dataset (torch.ndarray): The dataset.
@@ -66,9 +107,19 @@ def process_dataset(dataset, is_train, model_emb, batch_size=4, num_workers=4, d
     Load and process a given dataset for training or validation.
 
     Parameters:
-    - root_dir (str) : Root directory where the dataset will be stored.
-    - is_train (bool) : Boolean indicating whether the dataset is for training (True) or validation (False).
+    - dataset (torch.ndarray|dataset): The dataset.
+    - is_train (bool|string|None) : Value indicating whether the dataset is for training (True) or validation (False).
+    If None the dataloader will is given as a Dictionary or dataset object.
+    - model_emb (transformers| callable) : Embeddings model used to transform the dataset into a embeddings featurespace
     - batch_size (int) : The batch_size used for the DataLoader.
+    - num_workers (int) : The num_workers used for the DataLoader.
+    - device (str) : The deviced used for model_emb
+    - tokenizer (transformers| None) : Tokenizer is used for text models in combination with the model_emb. 
+    If None dataset is seen as transformed.
+    - collate_fn (callable) : The collate_fn used for the DataLoader.
+    - features_name (str): Dictonary name for the features.
+    - label_name (str): Dictonary name for the labels.
+    
 
     Returns:
     - X (numpy.ndarray): Concatenated embeddings of the dataset.
@@ -125,6 +176,19 @@ def process_dataset(dataset, is_train, model_emb, batch_size=4, num_workers=4, d
 
 # Define a function to process the text and obtain embeddings
 def get_text_embeddings(text, tokenizer, model_emb, device):
+    """
+    Function that trnsforms the texts using the given Tokenizer to obtain embeddings.
+
+    Parameters:
+    - text (list) : The batch texts form the dataloader.
+    - tokenizer (transformers) : Tokenizer is used for text models in combination with the model_emb. 
+    - model_emb (transformers) : Embeddings model used to transform the dataset into a embeddings featurespace
+    - device (str) : The deviced used for model_emb
+
+    Returns:
+    - embeddings (torch.ndarray): The embeddings of the batch.
+
+    """
     inputs = tokenizer(text, return_tensors="pt", padding=True, truncation=True, max_length=512)
     inputs.to(device)
     with torch.no_grad():
@@ -133,19 +197,38 @@ def get_text_embeddings(text, tokenizer, model_emb, device):
     return embeddings.cpu()
 
 def gen_seed(random_state:np.random.RandomState):
+    """
+    Function used to generate a consistent random seed
+    random_state
+    """
     return random_state.randint(0, 2**31)
 
 def gen_random_state(random_state:np.random.RandomState):
     return np.random.RandomState(gen_seed(random_state))
 
 def neg_brier_score_(p_class_pred, y_true):
+    """
+    Calculates the brier score for the muli-class case as scikit-learn only
+    implemented the binary class case.
+
+    Parameters:
+    - p_class_pred (numpy.ndarray) : Predict_proba of the classifier
+    - y_true (numpy.ndarray) : True label of all samples
+
+    Returns:
+    - neg_brier_score (float): Returns the brier score.
+    """
     y_one_hot = np.eye(p_class_pred.shape[1])[y_true]
     return np.mean(np.sum((p_class_pred - y_one_hot)**2, axis=1))
 
 def create_folders(params):
+    """
+    Function used to generate the experiment folder structer to safe the 
+    experiment results.
+    """
     exclude = "seed"
     dirs = {k:str(v) for k,v in params.items() if k not in exclude}
-    filepath = "experiments/"+"/".join(dirs.values())
+    filepath = f"{experiment_dir_path}/"+"/".join(dirs.values())
     os.makedirs(filepath, exist_ok=True)
     return filepath
 
@@ -200,6 +283,7 @@ def my_app(cfg: DictConfig) -> None:
             label_name = cfg.dataset.label_name
 
         # Load dataset using the method saved in the dataset config
+        # Note using openml load_dataset may leeds to errors
         data_loader_str = str(cfg.dataset.class_definition._target_).split(".")[0]
         if data_loader_str == "sklearn" or data_loader_str == "openml":
             if data_loader_str == "openml":
@@ -211,7 +295,8 @@ def my_app(cfg: DictConfig) -> None:
             X = X_df.values
         elif data_loader_str == "datasets":
             dataset = instantiate(cfg.dataset.class_definition)
-            # TODO: Generate a callate_fn to transform image data outside of torch
+            # As hugging face dosn't include transformers in the load function
+            # create a collate_fn for the dataloader to transform the batch.
             transformer = get_transformer_by_name(embeddings_model)
             if transformer is not None:
                 dl_class = DataloaderClass(transformer, features_name, label_name)
@@ -290,7 +375,7 @@ def my_app(cfg: DictConfig) -> None:
         X_train = scaler.fit_transform(X_train)
         X_test = scaler.transform(X_test)
 
-    print(f"Starting experiment for Dataset={dataset_name}, qs_name={qs_name}, model={model_name}, batch_size={batch_size}")
+    print(f"Starting experiment for Dataset={dataset_name}, qs_name={qs_name}, model={model_name}, batch_size={batch_size}", flush=True)
     # Generate model and query strategy
     model_class_str = str(cfg.model.class_definition._target_).split(".")[0]
     if "skactiveml" != model_class_str:
@@ -329,6 +414,11 @@ def my_app(cfg: DictConfig) -> None:
 
     # ======== Begin experiment =========
     for c in range(n_cycles):
+        if c %10==0:
+            print(f"number of cycles: {c}", flush=True)
+        # stop learning cycle if all samples are aquired
+        if len(X_train) <= c*batch_size:
+            break
         # active learning cycle
         start = time.time()
         query_idx = call_func(qs.query, X=X_train, y=y_train, batch_size=batch_size, clf=clf, discriminator=clf)
@@ -342,6 +432,8 @@ def my_app(cfg: DictConfig) -> None:
         y_test_proba = clf.predict_proba(X_test)
         
         score = accuracy_score(y_test_true,y_test_pred) 
+        # as the scores function differently depending on binary or multi-class
+        # classification seperate each use case.
         if classes <= 2:
             auroc = roc_auc_score(y_test_true, y_test_proba[:,1])
             y_true_proba = np.array([y_p[y_t] for y_p, y_t in zip(y_test_proba, y_test_true)])
@@ -364,9 +456,6 @@ def my_app(cfg: DictConfig) -> None:
         metric_dict['average_precision'].append(np.round(average_precision, decimals=decimals))
         metric_dict['balanced_accuracy'].append(np.round(balanced_accuracy, decimals=decimals))
         metric_dict['time'].append(np.round(end - start, decimals=decimals))
-        # stop learning cycle if all samples are aquired
-        if len(X_train) <= c*batch_size:
-            break
 
     # ======== Save experiment results =========
     # Save metric_dict using the experiments parameters
