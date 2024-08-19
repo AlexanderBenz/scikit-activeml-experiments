@@ -157,14 +157,17 @@ for (df_list, sel) in zip(df_metrics,df.values):
     std_interval =  np.round(np.std(errorbar_std[min_index:max_index]), decimals=decimals)
     results_df.loc[sel[index],sel[column]] = str(mean_interval) + u"\u00B1" + str(std_interval)
     # see if the number of runs is greater than seeds to calculate a fair score
-    if len(reshaped_result[:,max_index]) >= n_seeds:
-        ranking_results_df.loc[sel[index],sel[column]] = reshaped_result[:,max_index]
+    max_posible_index = min(max_index, reshaped_result.shape[1]-1)
+    if len(reshaped_result[:,max_posible_index]) >= n_seeds:
+        ranking_results_df.loc[sel[index],sel[column]] = reshaped_result[:,max_posible_index]
     
 # Rank each dataset seperatly for the last metric values over all seeds
 for key in ranking_results_df.keys():
     # seperate missing values
     mask = ranking_results_df[key].notna()
     mask_values = mask.values
+    if np.sum(mask_values) == 0:
+        continue
     replace_list = np.full(shape=len(mask_values), fill_value=np.nan)
     seed_metric = ranking_results_df[key].values
     seed_metric = np.array([ s for s in seed_metric[mask_values]])
