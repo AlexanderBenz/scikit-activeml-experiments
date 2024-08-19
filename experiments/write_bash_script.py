@@ -48,7 +48,7 @@ def write_commands(
         keys, values = zip(*cfg_dict["params"].items())
         permutations_dicts = [dict(zip(keys, v)) for v in product(*values)]
         n_jobs += len(permutations_dicts)
-        python_command = f"srun python"
+        python_command = f"srun python -u"
         if not use_slurm:
             commands = [commands[0]]
             python_command = f"python"
@@ -108,7 +108,7 @@ if __name__ == "__main__":
     path_python_file = "hydra_experiment.py"# "your/absolute/path/to/perform_experiment.py"
     directory = "./bash_scripts/"# "your/absolute/path/to/bash_scripts/"
     use_slurm = True
-    mem = "20gb"
+    mem = "40gb"
     max_n_parallel_jobs = 50
     cpus_per_task = 4
     accelerator = "gpu"
