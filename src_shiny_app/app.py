@@ -159,7 +159,7 @@ def server(input, output, session):
 
     @render.text
     def value():
-        return "Please load the Experiments before generating plots.", " Currently selected : " + len(list_expirement_metrics.get())
+        return "Please load the Experiments before generating plots.\n" + " Currently Loaded : " + str(len(list_expirement_metrics.get()))
     
     @render.data_frame
     @reactive.event(input.action_button)
@@ -188,20 +188,33 @@ def server(input, output, session):
         - use_pl (bool): Boolean deciding the plot return. If (True) return a plotly plot else if (False) return a matplotlip plot
         """
         sel_exp = list_expirement_metrics.get()
-        
+        sel_df = selected_df.get()
         if y_label is None:
             y_label = metric_str
+
+        legend_params = []
+        title_params = []
+        title = metric_str
+        for i in range(4):
+            params = np.unique(sel_exp[:,i])
+            if len(params) <= 1:
+                title_params.extend(params)
+            else:
+                legend_params.append(i)
+        if len(title_params) > 0:
+            title = '+'.join(title_params)
+
         # Create a plotly figure of matplotlib figure
         if use_pl:
             fig = go.Figure()
         else:
             fig, ax = plt.subplots()
-            ax.set_title(f"{metric_str} graph")
+            ax.set_title(f"Graph for {title}")
             ax.set_xlabel(x_label)
             ax.set_ylabel(y_label)
 
         # Itterate through all selected experiments and metrics
-        for (df_list, sel) in zip(selected_df.get(),sel_exp):
+        for (df_list, sel) in zip(sel_df,sel_exp):
             # Save all metrics for each df as most experiments are run on multiple seeds
             metric = []
             for df in df_list:
@@ -211,7 +224,7 @@ def server(input, output, session):
             errorbar_mean = np.mean(reshaped_result, axis=0)
             errorbar_std = np.std(reshaped_result, axis=0)
             batch_size = int(sel[3])
-            label_name = f"({np.mean(errorbar_mean):.4f}) {'+'.join(sel[:4])}"
+            label_name = f"({np.mean(errorbar_mean):.4f}) {'+'.join(sel[legend_params])}"
             if use_pl:
                 fig.add_trace(go.Scatter(
                 name=label_name,
@@ -227,7 +240,7 @@ def server(input, output, session):
             else:
                 ax.errorbar(np.arange(batch_size, (len(metric[0])+1)*batch_size, step=batch_size), errorbar_mean, errorbar_std, label=label_name, alpha=0.5)
         if use_pl:
-            fig.update_layout(title=dict(text=metric_str), xaxis_title=x_label, yaxis_title=y_label)
+            fig.update_layout(title=dict(text=title), xaxis_title=x_label, yaxis_title=y_label)
         else:
             ax.legend()
 
