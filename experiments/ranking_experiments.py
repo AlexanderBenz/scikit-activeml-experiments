@@ -31,7 +31,7 @@ parser.add_argument('--metric', metavar='metric', default="accuracy", required=F
                     help='Select metric used for the results')
 parser.add_argument('--min', metavar='min', default=0, required=False, type=int,
                     help='The minimal index for the cycles')
-parser.add_argument('--max', metavar='max', default=20, required=False, type=int,
+parser.add_argument('--max', metavar='max', default=5, required=False, type=int,
                     help='The maximal index for the cycles')
 parser.add_argument('--decimals', metavar='decimals', default=4, required=False, type=int,
                     help='The number of decimals after 0.')
@@ -156,19 +156,25 @@ for (df_list, sel) in zip(df_metrics,df.values):
     # Save all metrics for each df as most experiments are run on multiple seeds
     metric = []
     for df_ in df_list:
-        metric.append(df_[metric_str])
+        values = df_[metric_str].values
+        if len(metric) > 0:
+            values = values[:len(metric[-1])]
+        metric.append(values)
     # calculate the error bars 
     reshaped_result = np.array(metric).reshape((-1, len(metric[0])))
+    max_posible_index = min(max_index, reshaped_result.shape[1]-1)
+    min_possible_index = max_posible_index - (max_index - min_index)
     errorbar_mean = np.mean(reshaped_result, axis=0)
     errorbar_std =np.std(reshaped_result, axis=0)
     # calculate the mean for the given intervall
-    mean_interval = np.round(np.mean(errorbar_mean[min_index:max_index]), decimals=decimals)
-    std_interval =  np.round(np.std(errorbar_std[min_index:max_index]), decimals=decimals)
+    mean_interval = np.round(np.mean(errorbar_mean[min_possible_index:max_posible_index]), decimals=decimals)
+    std_interval =  np.round(np.std(errorbar_std[min_possible_index:max_posible_index]), decimals=decimals)
     results_df.loc[sel[index],sel[column]] = str(mean_interval) + u"\u00B1" + str(std_interval)
     # see if the number of runs is greater than seeds to calculate a fair score
-    max_posible_index = min(max_index, reshaped_result.shape[1]-1)
+    
     if len(reshaped_result[:,max_posible_index]) >= min_n_seeds:
-        ranking_results_df.loc[sel[index],sel[column]] = reshaped_result[:min_n_seeds,max_posible_index]
+        
+        ranking_results_df.loc[sel[index],sel[column]] = np.mean(reshaped_result[:min_n_seeds,min_possible_index:max_posible_index],axis=0)
     
 # Rank each dataset seperatly for the last metric values over all seeds
 for key in ranking_results_df.keys():
@@ -176,12 +182,16 @@ for key in ranking_results_df.keys():
     # seperate missing values
     mask = ranking_results_df[key].notna()
     mask_values = mask.values
+    # if no results exist for the dataset ignore this column
     if np.sum(mask_values) == 0:
         continue
     replace_list = np.full(shape=len(mask_values), fill_value=np.nan)
     seed_metric = ranking_results_df[key].values
     seed_metric = np.array([ s for s in seed_metric[mask_values]])
     print(seed_metric)
+    # if only one experiment exists ranking is not viable
+    if len(seed_metric.shape) < 2:
+        continue
     # calculate rank for each seed and replace the lists
     ranking_seeds = len(seed_metric) - np.argsort(seed_metric, axis=0).argsort(axis=0)
     ranking_mean = np.mean(ranking_seeds, axis=1)

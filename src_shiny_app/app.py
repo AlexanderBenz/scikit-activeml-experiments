@@ -23,13 +23,6 @@ def load_options():
     return qs_strategies, models, datasets, batch_sizes
 qs_strategies, models, datasets, batch_sizes = load_options()
 
-# initialies selected list
-
-# selected_datasets_list = []
-# selected_models_list = []
-# selected_qs_list = []
-# selected_batch_sizes_list = []
-
 # initial params
 
 experiment_path = "experiments_results\\"
@@ -52,37 +45,52 @@ app_ui = ui.page_fluid(
         ui.sidebar(
             ui.h2("Search options"),
             ui.hr(),
-            "When selecting None all are selected",
-            ui.input_checkbox_group(  
-                "datasets",  
-                "Datasets",  
-                to_dict(datasets),  
-            ),
-            ui.input_checkbox_group(  
-                "models",  
-                "Models",  
-                to_dict(models),  
-            ),
-            ui.input_checkbox_group(  
-                "qs_strategies",  
-                "Query Strategies",  
-                to_dict(qs_strategies),  
-            ),
-            ui.input_checkbox_group(  
-                "batch_sizes",  
-                "Batch sizes",  
-                to_dict(batch_sizes),  
-                inline=True,
-            ),
-            
-            ui.input_action_button("action_button", "Search"),  
-            
+            "When selecting no modalities in each category all available results are selected",
+            ui.accordion(
+                ui.accordion_panel(
+                    "Datasets",
+                    ui.input_checkbox_group(  
+                        "datasets",  
+                        "",  
+                        to_dict(datasets),  
+                    ),
+                ),
+                ui.accordion_panel(
+                    "Models",
+                    ui.input_checkbox_group(  
+                        "models",  
+                        "",  
+                        to_dict(models),  
+                    ),
+                ),
+                ui.accordion_panel(
+                    "Query Strategies",
+                    ui.input_checkbox_group(  
+                        "qs_strategies",  
+                        "",  
+                        to_dict(qs_strategies),  
+                    ),   
+                ),
+                ui.accordion_panel(
+                    "Batch Size",
+                    ui.input_checkbox_group(  
+                        "batch_sizes",  
+                        "",  
+                        to_dict(batch_sizes),  
+                        inline=True,
+                    ),
+                ),
+                open=False
+            ), 
+            open="open",
+            width=350,
         ),
+        ui.input_action_button("action_button", "Search"),
         ui.output_ui("rows"),
         ui.page_fluid(
             ui.output_data_frame("datatable"),
         ),
-        
+        height="800px" 
     ),
     ui.layout_column_wrap(
         ui.input_action_button("generate_plots", "Generate plots"),
@@ -97,7 +105,7 @@ app_ui = ui.page_fluid(
         output_widget("neg_log_loss"),
         output_widget("average_precision"),
         output_widget("balanced_accuracy"),
-        # output_widget("time"),
+        output_widget("time"),
         ui.download_button("download", "Download results")
     )
 
@@ -123,6 +131,7 @@ def server(input, output, session):
         for selected_dataframe in selected_dataframes_list:
             current_path = "/".join(selected_dataframe[:4])
             url_path = "/".join(selected_dataframe)
+            # If you are using a local file change the url path with "file://path/to/file"
             csv_url = f"https://raw.githubusercontent.com/AlexanderBenz/scikit-activeml-experiments/main/experiments/experiments_results/{url_path}"
             tmp = http.request("GET", csv_url, timeout=0.2)
 
@@ -177,7 +186,7 @@ def server(input, output, session):
         selected_experiments.set(rows)
         return f"Rows selected (select multiple with ctrl): {selected} "
     
-    def create_fig(metric_str, x_label="number of samples", y_label=None, use_pl=True):
+    def create_fig(metric_str, x_label="number of samples", y_label=None, use_pl=True, use_bar=False):
         """
         Function to create plotly plots or matplotlip plots
 
@@ -185,7 +194,10 @@ def server(input, output, session):
         - metric_str (str): String to select the correct metric from the selected experiments.
         - x_label (str): Name of the x cordinate.
         - y_label (str|None): Name of the y cordinate. If none use the metric_str
-        - use_pl (bool): Boolean deciding the plot return. If (True) return a plotly plot else if (False) return a matplotlip plot
+        - use_pl (bool): Boolean deciding the plot return. If (True) return a
+        plotly plot else if (False) return a matplotlip plot
+        - use_bar (bool): Boolean deciding the plotly return. If (True) return 
+        a bar plot else if (False) return a scatter plot
         """
         sel_exp = list_expirement_metrics.get()
         sel_df = selected_df.get()
@@ -226,21 +238,29 @@ def server(input, output, session):
             batch_size = int(sel[3])
             label_name = f"({np.mean(errorbar_mean):.4f}) {'+'.join(sel[legend_params])}"
             if use_pl:
-                fig.add_trace(go.Scatter(
-                name=label_name,
-                x=np.arange(batch_size, (len(metric[0])+1)*batch_size, step=batch_size),
-                y=errorbar_mean,
-                error_y=dict(
-                    type='data', # value of error bar given in data coordinates
-                    array=errorbar_std,
-                    visible=True)
-                    )
-                )
-                
+                if use_bar:
+                    fig.add_trace(go.Bar(
+                        name=f"Mean Runtime: ({np.sum(errorbar_mean):.2f}) {'+'.join(sel[legend_params])}",
+                        x=['+'.join(sel[legend_params])], y=errorbar_mean,
+                        error_y=dict(type='data', array=errorbar_std)
+                    ))
+                else:
+                    fig.add_trace(go.Scatter(
+                    name=label_name,
+                    x=np.arange(batch_size, (len(metric[0])+1)*batch_size, step=batch_size),
+                    y=errorbar_mean,
+                    error_y=dict(
+                        type='data', # value of error bar given in data coordinates
+                        array=errorbar_std,
+                        visible=True)
+                        )
+                    )        
             else:
                 ax.errorbar(np.arange(batch_size, (len(metric[0])+1)*batch_size, step=batch_size), errorbar_mean, errorbar_std, label=label_name, alpha=0.5)
         if use_pl:
             fig.update_layout(title=dict(text=title), xaxis_title=x_label, yaxis_title=y_label)
+            if use_bar:
+                fig.update_layout(barmode='group')
         else:
             ax.legend()
 
@@ -289,10 +309,10 @@ def server(input, output, session):
     def balanced_accuracy(): 
         return create_fig("balanced_accuracy")  
     
-    # @render_widget
-    # @reactive.event(input.generate_plots)
-    # def acc_plotly(): 
-    #     return create_fig("time")  
+    @render_widget
+    @reactive.event(input.generate_plots)
+    def time(): 
+        return create_fig("time", use_bar=True, x_label="", y_label="Time in seconds per query")  
     
     # generate the download Button
     @render.download(filename="experiemnt_results.csv")
