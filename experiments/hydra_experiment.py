@@ -306,7 +306,9 @@ def my_app(cfg: DictConfig) -> None:
         elif data_loader_str == "torchvision":
             dataset_train = load_torch_dataset(loader=cfg.dataset.class_definition, root_dir=data_dir, split_dict=cfg.dataset.train_params, backbone_name=embeddings_model, download=cache)
             dataset_eval = load_torch_dataset(loader=cfg.dataset.class_definition, root_dir=data_dir, split_dict=cfg.dataset.eval_params, backbone_name=embeddings_model, download=cache)     
-        
+            if hasattr(cfg.dataset, "extra_split_params"):
+                dataset_extra = load_torch_dataset(loader=cfg.dataset.class_definition, root_dir=data_dir, split_dict=cfg.dataset.extra_split_params, backbone_name=embeddings_model, download=cache) 
+                dataset_eval = torch.utils.data.ConcatDataset([dataset_eval, dataset_extra])
 
         # If a backbone is given load and use backbone on dataset_train and dataset_eval
         if hasattr(cfg, "backbone"):
@@ -329,7 +331,9 @@ def my_app(cfg: DictConfig) -> None:
             # Use the embedings model to generate X and y depending on the loading method used
             if dataset is None:
                 X_train, y_train_true = process_dataset(dataset=dataset_train, is_train=True, model_emb=model_emb, batch_size=dataloader_batch_size, num_workers=num_workers, device=device, tokenizer=tokenizer, features_name=features_name, label_name=label_name)
+                print(len(X_train))
                 X_test, y_test_true = process_dataset(dataset=dataset_eval, is_train=False, model_emb=model_emb, batch_size=dataloader_batch_size, num_workers=num_workers, device=device, tokenizer=tokenizer, features_name=features_name, label_name=label_name)
+                print(len(X_test))
                 X = np.append(X_train, X_test, axis=0)
                 y = np.append(y_train_true, y_test_true, axis=0)
             else:

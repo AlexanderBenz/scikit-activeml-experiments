@@ -7,6 +7,8 @@ train_params:
   split : 'train'
 eval_params:
   split : 'val'  
+extra_split_params:
+  split : 'test'
 num_workers: 4
 dataloader_batch_size: 32
 classes: 47

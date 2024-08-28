@@ -29,7 +29,7 @@ experiment_path = "experiments_results\\"
 experiments_df = reactive.value([])
 all_experiments_df = reactive.value()
 selected_df = reactive.value([])
-list_expirement_metrics = reactive.value([])
+tmp = reactive.value("")
 selected_experiments = reactive.value([])
 
 # generate dictionaries
@@ -124,7 +124,6 @@ def server(input, output, session):
         selected_dataframes_list = selected_dataframes_list.loc[selected_dataframes_list['qs_strategy'].isin(sel_dataframe[:,2])]
         selected_dataframes_list = selected_dataframes_list.loc[selected_dataframes_list['batch_size'].isin(sel_dataframe[:,3])]
         selected_dataframes_list = selected_dataframes_list.values
-        list_expirement_metrics.set(sel_dataframe)
         df = []
         old_path = ""
         http = urllib3.PoolManager(num_pools=1)
@@ -136,8 +135,8 @@ def server(input, output, session):
             tmp = http.request("GET", csv_url, timeout=0.2)
 
             if old_path != current_path:
-                df.append([])
-            df[-1].append(pd.read_csv(StringIO(tmp.data.decode("utf-8")), index_col="step"))
+                df.append(([], selected_dataframe[:4]))
+            df[-1][0].append(pd.read_csv(StringIO(tmp.data.decode("utf-8")), index_col="step"))
 
             old_path = current_path
         selected_df.set(df)
@@ -162,13 +161,13 @@ def server(input, output, session):
             df = df.loc[df['batch_size'].isin(selected_batch_sizes_list)]
         all_experiments_df.set(df)
 
-        df = df[["dataset", "model", "qs_strategy", "batch_size"]].drop_duplicates()
+        df_ = df[["dataset", "model", "qs_strategy", "batch_size"]].drop_duplicates()
 
-        experiments_df.set(df)
+        experiments_df.set(df_)
 
     @render.text
     def value():
-        return "Please load the Experiments before generating plots.\n" + " Currently Loaded : " + str(len(list_expirement_metrics.get()))
+        return "Please load the Experiments before generating plots.\n" + " Currently Loaded : " + str(len(selected_df.get())) + tmp.get()
     
     @render.data_frame
     @reactive.event(input.action_button)
@@ -199,16 +198,15 @@ def server(input, output, session):
         - use_bar (bool): Boolean deciding the plotly return. If (True) return 
         a bar plot else if (False) return a scatter plot
         """
-        sel_exp = list_expirement_metrics.get()
-        sel_df = selected_df.get()
         if y_label is None:
             y_label = metric_str
-
+        sel_exp = selected_df.get()
         legend_params = []
         title_params = []
         title = metric_str
+        sel_exp_names = np.array([tmp[1] for tmp in sel_exp])
         for i in range(4):
-            params = np.unique(sel_exp[:,i])
+            params = np.unique(sel_exp_names[:,i])
             if len(params) <= 1:
                 title_params.extend(params)
             else:
@@ -224,9 +222,8 @@ def server(input, output, session):
             ax.set_title(f"Graph for {title}")
             ax.set_xlabel(x_label)
             ax.set_ylabel(y_label)
-
         # Itterate through all selected experiments and metrics
-        for (df_list, sel) in zip(sel_df,sel_exp):
+        for (df_list, sel) in selected_df.get():
             # Save all metrics for each df as most experiments are run on multiple seeds
             metric = []
             for df in df_list:
@@ -319,8 +316,7 @@ def server(input, output, session):
     @reactive.event(input.generate_plots)
     #TODO: look at how to zip the files
     def download():
-        sel_exp = list_expirement_metrics.get()
-        for (df_list, sel) in zip(selected_df.get(),sel_exp):
+        for (df_list, sel) in selected_df.get():
             for i, df in enumerate(df_list):
             # df_list["experiment_path"] = sel
                 csv = df.to_csv(index=False)
