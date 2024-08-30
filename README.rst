@@ -12,29 +12,29 @@ Datasets
 +------------+---------+---------+--------------+---------------------+
 | Dataset    | Samples | Classes | General Task |           Dimension |
 +============+=========+=========+==============+=====================+
-| CAT_vs_DOG |  23 410 |    2    |     Image    |     4x4px-500x500px |
+| CAT_vs_DOG |  23410  |      2  |     Image    |     4x4px-500x500px |
 +------------+---------+---------+--------------+---------------------+
-| CIFAR10    |  60 000 |    10   |     Image    |             32x32px |
+| CIFAR10    |  60000  |     10  |     Image    |             32x32px |
 +------------+---------+---------+--------------+---------------------+
-| CIFAR100   |  60 000 |   100   |     Image    |             32x32px |
+| CIFAR100   |  60000  |    100  |     Image    |             32x32px |
 +------------+---------+---------+--------------+---------------------+
-| DTD        |  5 640  |    47   |     Image    | 300x300px-640x640px |
+| DTD        |   5640  |     47  |     Image    | 300x300px-640x640px |
 +------------+---------+---------+--------------+---------------------+
-| AG-NEWS    | 127 600 |    4    |     Text     |      100–1000 words |
+| AG-NEWS    | 127600  |      4  |     Text     |      100–1000 words |
 +------------+---------+---------+--------------+---------------------+
-| BANK77     |  13083  |    77   |     Text     |        13–433 words |
+| BANK77     |  13083  |     77  |     Text     |        13–433 words |
 +------------+---------+---------+--------------+---------------------+
-| DBpedia    | 630 000 |    14   |     Text     |       3-13600 words |
+| DBpedia    | 630000  |     14  |     Text     |       3-13600 words |
 +------------+---------+---------+--------------+---------------------+
-| TREC6      |   5952  |    6    |     Text     |       10 words avg. |
+| TREC6      |   5952  |      6  |     Text     |       10 words avg. |
 +------------+---------+---------+--------------+---------------------+
-| ALOI       | 108 000 |   1000  |    Tabular   |        128 features |
+| ALOI       | 108000  |   1000  |    Tabular   |        128 features |
 +------------+---------+---------+--------------+---------------------+
-| IRIS       |   150   |    3    |    Tabular   |          4 features |
+| IRIS       |    150  |      3  |    Tabular   |          4 features |
 +------------+---------+---------+--------------+---------------------+
-| LETTER     |  20 000 |    26   |    Tabular   |         16 features |
+| LETTER     |  20000  |     26  |    Tabular   |         16 features |
 +------------+---------+---------+--------------+---------------------+
-| PENDIGITS  |  10992  |    10   |    Tabular   |         16 features |
+| PENDIGITS  |  10992  |     10  |    Tabular   |         16 features |
 +------------+---------+---------+--------------+---------------------+
 
 Query Strategies, Classifiers
@@ -141,6 +141,10 @@ To provide new experiments, there are three options.
 Running the website locally
 ============================
 
+Before running the website locally it is important to change the code
+as the download path for the experiment results needs to be changed or new
+results won't be shown. The changes need to be made in:
+**src_shiny_app/app.py** for the method **load_experiment**.
 To run the website locally to display the results locally, there are two 
 different methods. Either open the app using:
 ``shiny run src_shiny_app/app.py``
