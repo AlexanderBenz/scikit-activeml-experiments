@@ -6,7 +6,45 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 import pandas as pd
 import urllib3
+import copy
 from io import StringIO
+# Links to the dataset download or funktion used
+DATASETLINKS = {
+    "ag_news_bert-base-uncased": "https://huggingface.co/datasets/fancyzhx/ag_news",
+    "aloi": "https://www.openml.org/search?type=data&status=active&id=42396",
+    "banking77_bert-base-uncased": "https://huggingface.co/datasets/PolyAI/banking77",
+    "cat_and_dog_dinov2_vits14": "https://huggingface.co/datasets/microsoft/cats_vs_dogs",
+    "cifar100_dinov2_vits14": "https://pytorch.org/vision/stable/generated/torchvision.datasets.CIFAR100.html#torchvision.datasets.CIFAR100",
+    "cifar10_dinov2_vits14": "https://pytorch.org/vision/stable/generated/torchvision.datasets.CIFAR10.html#torchvision.datasets.CIFAR10",
+    "dbpedia_bert-base-uncased": "https://huggingface.co/datasets/fancyzhx/dbpedia_14",
+    "dtd_dinov2_vits14": "https://pytorch.org/vision/stable/generated/torchvision.datasets.DTD.html#torchvision.datasets.DTD",
+    "iris": "https://www.openml.org/search?type=data&status=active&id=61",
+    "letter": "https://www.openml.org/search?type=data&status=active&id=6",
+    "pendigits": "https://www.openml.org/search?type=data&status=active&id=32",
+    "trec6_bert-base-uncased": "https://huggingface.co/datasets/CogComp/trec",
+}
+# Links to the query strategy examples
+QSLINKS = {
+    "Alce": "https://scikit-activeml.github.io/scikit-activeml-docs/latest/generated/sphinx_gallery_examples/pool/plot-CostEmbeddingAL-Active_Learning_with_Cost_Embedding_%28ALCE%29.html",
+    "Badge": "https://scikit-activeml.github.io/scikit-activeml-docs/latest/generated/sphinx_gallery_examples/pool/plot-Badge-Batch_Active_Learning_by_Diverse_Gradient_Embedding_%28BADGE%29.html",
+    "Clue": "https://scikit-activeml.github.io/scikit-activeml-docs/latest/generated/sphinx_gallery_examples/pool/plot-Clue-Clustering_Uncertainty-weighted_Embeddings_%28CLUE%29.html",
+    "ContrastiveAL": "https://scikit-activeml.github.io/scikit-activeml-docs/latest/generated/sphinx_gallery_examples/pool/plot-ContrastiveAL-Contrastive_Active_Learning_%28CAL%29.html",
+    "CoreSet": "https://scikit-activeml.github.io/scikit-activeml-docs/latest/generated/sphinx_gallery_examples/pool/plot-CoreSet-Core_Set.html",
+    "GreedySamplingX": "https://scikit-activeml.github.io/scikit-activeml-docs/latest/generated/sphinx_gallery_examples/pool/plot-GreedySamplingX-Greedy_Sampling_on_the_Feature_Space_%28GSx%29.html",
+    "ProbCover": "https://scikit-activeml.github.io/scikit-activeml-docs/latest/generated/sphinx_gallery_examples/pool/plot-ProbCover-Probability_Coverage_%28ProbCover%29.html",
+    "ProbabilisticAL": "https://scikit-activeml.github.io/scikit-activeml-docs/latest/generated/sphinx_gallery_examples/pool/plot-ProbabilisticAL-Multi-class_Probabilistic_Active_Learning_%28McPAL%29.html",
+    "RandomSampling": "https://scikit-activeml.github.io/scikit-activeml-docs/latest/generated/sphinx_gallery_examples/pool/plot-RandomSampling-Random_Sampling.html",
+    "TypiClust": "https://scikit-activeml.github.io/scikit-activeml-docs/latest/generated/sphinx_gallery_examples/pool/plot-TypiClust-Typical_Clustering_%28TypiClust%29.html",
+    "USEntropy": "https://scikit-activeml.github.io/scikit-activeml-docs/latest/generated/sphinx_gallery_examples/pool/plot-UncertaintySampling-Uncertainty_Sampling_with_Entropy.html",
+    "USMargin": "https://scikit-activeml.github.io/scikit-activeml-docs/latest/generated/sphinx_gallery_examples/pool/plot-UncertaintySampling-Uncertainty_Sampling_with_Margin.html",
+    "USLeastConfident": "https://scikit-activeml.github.io/scikit-activeml-docs/latest/generated/sphinx_gallery_examples/pool/plot-UncertaintySampling-Uncertainty_Sampling_with_Least-Confidence.html",
+}
+# Links to the models
+MODELLINKS = {
+    "LogisticRegression": "https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html",
+    "ParzenWindowClassifier": "https://scikit-activeml.github.io/scikit-activeml-docs/latest/generated/api/skactiveml.classifier.ParzenWindowClassifier.html#skactiveml.classifier.ParzenWindowClassifier",
+    "RandomForestClassifier": "https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html",
+}
 
 app_dir = Path(__file__).parent
 
@@ -36,7 +74,17 @@ selected_experiments = reactive.value([])
 
 def to_dict(lst):
     """As the checkbox ui element needs a dictonary convert the lists into dictionaries"""
-    return {i: i for i in lst}
+    if lst[0] in DATASETLINKS.keys():
+        return {i: ui.tags.a(i, href=DATASETLINKS[i], target='_blank', _add_ws=True) for i in lst}
+        # return {i: ui.div(i + " ", ui.tags.a("[Link]", href=DATASETLINKS[i], target='_blank', _add_ws=True)) for i in lst}
+    elif lst[0] in MODELLINKS.keys():
+        return {i: ui.tags.a(i, href=MODELLINKS[i], target='_blank', _add_ws=True) for i in lst}
+        # return {i: ui.div(i + " ", ui.tags.a("[Link]", href=MODELLINKS[i], target='_blank', _add_ws=True)) for i in lst}
+    elif lst[0] in QSLINKS.keys():
+        return {i: ui.tags.a(i, href=QSLINKS[i], target='_blank', _add_ws=True) for i in lst}
+        # return {i: ui.div(i + " ", ui.tags.a("[Link]", href=QSLINKS[i], target='_blank', _add_ws=True)) for i in lst}
+    else:
+        return {i: i for i in lst}
       
 # The app ui functions as the frontpage and includes all input and output Ui ellements
 app_ui = ui.page_fluid(
@@ -45,14 +93,15 @@ app_ui = ui.page_fluid(
         ui.sidebar(
             ui.h2("Search options"),
             ui.hr(),
-            "When selecting no modalities in each category all available results are selected",
+            "If no modalities are chosen in a category, all available options are automatically selected.",
             ui.accordion(
                 ui.accordion_panel(
                     "Datasets",
                     ui.input_checkbox_group(  
                         "datasets",  
                         "",  
-                        to_dict(datasets),  
+                        to_dict(datasets),
+                        # inline=True
                     ),
                 ),
                 ui.accordion_panel(
@@ -61,6 +110,7 @@ app_ui = ui.page_fluid(
                         "models",  
                         "",  
                         to_dict(models),  
+                        # inline=True
                     ),
                 ),
                 ui.accordion_panel(
@@ -68,7 +118,8 @@ app_ui = ui.page_fluid(
                     ui.input_checkbox_group(  
                         "qs_strategies",  
                         "",  
-                        to_dict(qs_strategies),  
+                        to_dict(qs_strategies),
+                        # inline=True
                     ),   
                 ),
                 ui.accordion_panel(
@@ -83,7 +134,7 @@ app_ui = ui.page_fluid(
                 open=False
             ), 
             open="open",
-            width=350,
+            width=380,
         ),
         ui.input_action_button("action_button", "Search"),
         ui.output_ui("rows"),
@@ -180,8 +231,14 @@ def server(input, output, session):
     @render.ui
     def rows():
         """Ui function to display and save the chosen rows of the experiments. """
-        rows = datatable.cell_selection()["rows"]  
+        rows = datatable.cell_selection()["rows"]
+        
         selected = ", ".join(str(i) for i in sorted(rows)) if rows else "None"
+        # This results in an error when generating the plots 
+        # if len(rows) == 0:
+        #     r_len = len(datatable.data_view())
+        #     rows = [*range(r_len)]
+        #     selected = "All"
         selected_experiments.set(rows)
         return f"Rows selected (select multiple with ctrl): {selected} "
     
@@ -205,6 +262,15 @@ def server(input, output, session):
         title_params = []
         title = metric_str
         sel_exp_names = np.array([tmp[1] for tmp in sel_exp])
+        if len(sel_exp_names) <= 0:
+            if use_pl:
+                fig = go.Figure()
+            else:
+                fig, ax = plt.subplots()
+                ax.set_title(f"Graph for {title}")
+                ax.set_xlabel(x_label)
+                ax.set_ylabel(y_label)
+            return fig
         for i in range(4):
             params = np.unique(sel_exp_names[:,i])
             if len(params) <= 1:

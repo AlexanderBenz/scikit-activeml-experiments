@@ -6568,6 +6568,8 @@ dtd_dinov2_vits14,LogisticRegression,TypiClust,10,6.csv
 dtd_dinov2_vits14,LogisticRegression,TypiClust,10,7.csv
 dtd_dinov2_vits14,LogisticRegression,TypiClust,10,8.csv
 dtd_dinov2_vits14,LogisticRegression,TypiClust,10,9.csv
+dtd_dinov2_vits14,LogisticRegression,TypiClust,50,0.csv
+dtd_dinov2_vits14,LogisticRegression,TypiClust,50,1.csv
 dtd_dinov2_vits14,LogisticRegression,TypiClust,50,2.csv
 dtd_dinov2_vits14,LogisticRegression,TypiClust,50,3.csv
 dtd_dinov2_vits14,LogisticRegression,TypiClust,50,4.csv
@@ -6866,6 +6868,14 @@ dtd_dinov2_vits14,ParzenWindowClassifier,TypiClust,10,6.csv
 dtd_dinov2_vits14,ParzenWindowClassifier,TypiClust,10,7.csv
 dtd_dinov2_vits14,ParzenWindowClassifier,TypiClust,10,8.csv
 dtd_dinov2_vits14,ParzenWindowClassifier,TypiClust,10,9.csv
+dtd_dinov2_vits14,ParzenWindowClassifier,TypiClust,50,0.csv
+dtd_dinov2_vits14,ParzenWindowClassifier,TypiClust,50,1.csv
+dtd_dinov2_vits14,ParzenWindowClassifier,TypiClust,50,2.csv
+dtd_dinov2_vits14,ParzenWindowClassifier,TypiClust,50,3.csv
+dtd_dinov2_vits14,ParzenWindowClassifier,TypiClust,50,4.csv
+dtd_dinov2_vits14,ParzenWindowClassifier,TypiClust,50,5.csv
+dtd_dinov2_vits14,ParzenWindowClassifier,TypiClust,50,6.csv
+dtd_dinov2_vits14,ParzenWindowClassifier,TypiClust,50,7.csv
 dtd_dinov2_vits14,ParzenWindowClassifier,TypiClust,50,8.csv
 dtd_dinov2_vits14,ParzenWindowClassifier,TypiClust,50,9.csv
 dtd_dinov2_vits14,ParzenWindowClassifier,USEntropy,1,0.csv
@@ -7218,6 +7228,7 @@ dtd_dinov2_vits14,RandomForestClassifier,TypiClust,10,6.csv
 dtd_dinov2_vits14,RandomForestClassifier,TypiClust,10,7.csv
 dtd_dinov2_vits14,RandomForestClassifier,TypiClust,10,8.csv
 dtd_dinov2_vits14,RandomForestClassifier,TypiClust,10,9.csv
+dtd_dinov2_vits14,RandomForestClassifier,TypiClust,50,0.csv
 dtd_dinov2_vits14,RandomForestClassifier,TypiClust,50,1.csv
 dtd_dinov2_vits14,RandomForestClassifier,TypiClust,50,2.csv
 dtd_dinov2_vits14,RandomForestClassifier,TypiClust,50,3.csv
