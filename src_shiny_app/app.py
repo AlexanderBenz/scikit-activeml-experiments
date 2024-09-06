@@ -156,7 +156,7 @@ app_ui = ui.page_fluid(
         output_widget("neg_log_loss"),
         output_widget("average_precision"),
         output_widget("balanced_accuracy"),
-        output_widget("time"),
+        # output_widget("time"),
         ui.download_button("download", "Download results")
     )
 
@@ -240,7 +240,7 @@ def server(input, output, session):
         #     rows = [*range(r_len)]
         #     selected = "All"
         selected_experiments.set(rows)
-        return f"Rows selected (select multiple with ctrl): {selected} "
+        return f"Rows selected (select multiple with ctrl or shift+ctrl): {selected} "
     
     def create_fig(metric_str, x_label="number of samples", y_label=None, use_pl=True, use_bar=False):
         """
@@ -303,7 +303,7 @@ def server(input, output, session):
             if use_pl:
                 if use_bar:
                     fig.add_trace(go.Bar(
-                        name=f"Mean Runtime: ({np.sum(errorbar_mean):.2f}) {'+'.join(sel[legend_params])}",
+                        name=f"Mean Runtime: ({np.mean(errorbar_mean):.2f}) {'+'.join(sel[legend_params])}",
                         x=['+'.join(sel[legend_params])], y=errorbar_mean,
                         error_y=dict(type='data', array=errorbar_std)
                     ))
@@ -371,11 +371,11 @@ def server(input, output, session):
     @reactive.event(input.generate_plots)
     def balanced_accuracy(): 
         return create_fig("balanced_accuracy")  
-    
-    @render_widget
-    @reactive.event(input.generate_plots)
-    def time(): 
-        return create_fig("time", use_bar=True, x_label="", y_label="Time in seconds per query")  
+    # TODO look into why the time plots don't function correctly
+    # @render_widget
+    # @reactive.event(input.generate_plots)
+    # def time(): 
+    #     return create_fig("time", use_bar=True, x_label="", y_label="Time in seconds per query")  
     
     # generate the download Button
     @render.download(filename="experiemnt_results.csv")
